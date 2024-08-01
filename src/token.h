@@ -1,6 +1,9 @@
 #ifndef HIGANCC_TOKEN_H
 #define HIGANCC_TOKEN_H
 
+#include <stdio.h>
+#include <stdlib.h>
+
 typedef enum {
   // Single-character tokens.
   TOKEN_LEFT_PAREN, TOKEN_RIGHT_PAREN,
@@ -34,5 +37,4 @@ typedef struct {
 } Token;
 
 void print_token(const Token *token);
-
 #endif

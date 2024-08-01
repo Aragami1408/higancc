@@ -10,6 +10,7 @@ typedef struct {
 } Lexer;
 
 Lexer *Lexer_init(const char *source);
+void Lexer_scanTokens(Lexer *lexer);
 Token Lexer_scanToken(Lexer *lexer);
 
 void Lexer_free(Lexer *lexer);

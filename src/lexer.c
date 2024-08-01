@@ -164,7 +164,6 @@ Lexer *Lexer_init(const char *source) {
   return lexer;
 }
 
-
 Token Lexer_scanToken(Lexer *lexer) {
   skip_whitespace(lexer);
   lexer->start = lexer->current;

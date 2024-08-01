@@ -4,33 +4,37 @@
 #include "utils.h"
 #include "lexer.h"
 
+#define STB_DS_IMPLEMENTATION
+#include "stb_ds.h"
+
 int main(int argc, char **argv) {
   if (argc == 1) {
     printf("higancc: fatal error: no input files\n");
     printf("compilation terminated\n");
-    exit(1);
+    return 1;
   }
   Options opts = Options_parse(argc, argv);
 
   Lexer *lexer = NULL;
+  Token *tokens = NULL;
 
   if (opts.lexer) {
     printf("Here's the Token list: \n");
     const char *buffer = read_file(argv[2]);
 
     lexer = Lexer_init(buffer);
-    int line = -1;
-    for (;;) {
-      Token token = Lexer_scanToken(lexer);
-      if (token.line != line) {
-        printf("%4d ", token.line);
-      }
-      else {
-        printf("\t| ");
-      }
-      printf("%2d '%.*s'\n", token.type, token.length, token.start);
+    Token token;
+    do {
+      token = Lexer_scanToken(lexer);
+      arrput(tokens, token);
+    } while (token.type != TOKEN_EOF);
 
-      if (token.type == TOKEN_EOF) break;
+    for (int i = 0; i < arrlen(tokens); i++) {
+      Token token = tokens[i];
+      print_token(&token);
+      if (token.type == TOKEN_ERROR || token.type == TOKEN_EOF) {
+        break;
+      }
     }
   }
   if (opts.parser) {
