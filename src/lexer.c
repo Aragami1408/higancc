@@ -104,6 +104,18 @@ static Token string(Lexer *lexer) {
   return make_token(lexer, TOKEN_STRING);
 }
 
+static Token character(Lexer *lexer) {
+  while (peek(lexer) != '\'' && !is_at_end(lexer)) {
+    if (peek(lexer) == '\n') lexer->line++;
+    advance(lexer);
+  }
+
+  if (is_at_end(lexer)) return error_token(lexer, "Unterminated char.");
+
+  advance(lexer);
+  return make_token(lexer, TOKEN_CHAR);
+}
+
 static bool is_alpha(char c) {
   return (c >= 'a' && c <= 'z') ||
          (c >= 'A' && c <= 'Z') ||
@@ -125,10 +137,13 @@ static TokenType check_keyword(const Lexer *lexer, int start, int length, const 
 static TokenType identifier_or_keyword_type(const Lexer *lexer) {
   switch (lexer->start[0]) {
     case 'i': 
-      if (lexer->start[1] == 'f')
-        return TOKEN_KW_IF;
-      else
-        return check_keyword(lexer, 1, 2, "nt", TOKEN_KW_INT); 
+      if (lexer->current - lexer->start > 1) {
+        switch (lexer->start[1]) {
+          case 'n': return check_keyword(lexer, 2, 1, "t", TOKEN_KW_INT);
+          case 'f': return TOKEN_KW_IF;
+        }
+      }
+      break;
     case 'v': return check_keyword(lexer, 1, 3, "oid", TOKEN_KW_VOID);
     case 'r': return check_keyword(lexer, 1, 5, "eturn", TOKEN_KW_RETURN);
   }
@@ -217,6 +232,8 @@ Token Lexer_scanToken(Lexer *lexer) {
               return make_token(lexer, match(lexer, '=') ? TOKEN_GREATER_EQUAL : TOKEN_GREATER);
     case '"':
               return string(lexer);
+    case '\'':
+              return character(lexer);
   }
 
 
