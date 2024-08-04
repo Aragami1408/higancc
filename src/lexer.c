@@ -5,6 +5,9 @@
 #include <string.h>
 #include <stdbool.h>
 
+#define STB_DS_IMPLEMENTATION
+#include "stb_ds.h"
+
 static bool is_at_end(const Lexer *lexer) {
   return *lexer->current == '\0';
 }
@@ -121,7 +124,11 @@ static TokenType check_keyword(const Lexer *lexer, int start, int length, const 
 
 static TokenType identifier_or_keyword_type(const Lexer *lexer) {
   switch (lexer->start[0]) {
-    case 'i': return check_keyword(lexer, 1, 2, "nt", TOKEN_KW_INT); 
+    case 'i': 
+      if (lexer->start[1] == 'f')
+        return TOKEN_KW_IF;
+      else
+        return check_keyword(lexer, 1, 2, "nt", TOKEN_KW_INT); 
     case 'v': return check_keyword(lexer, 1, 3, "oid", TOKEN_KW_VOID);
     case 'r': return check_keyword(lexer, 1, 5, "eturn", TOKEN_KW_RETURN);
   }
@@ -162,6 +169,20 @@ Lexer *Lexer_init(const char *source) {
   lexer->line = 1;
 
   return lexer;
+}
+
+Token *Lexer_scanTokens(Lexer *lexer, usize *len) {
+  Token *tokens = NULL;
+
+  Token token;
+  do {
+    token = Lexer_scanToken(lexer);
+    arrput(tokens, token);
+  } while (token.type != TOKEN_EOF);
+
+  *len = arrlenu(tokens);
+
+  return tokens;
 }
 
 Token Lexer_scanToken(Lexer *lexer) {

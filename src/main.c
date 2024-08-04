@@ -4,8 +4,6 @@
 #include "utils.h"
 #include "lexer.h"
 
-#define STB_DS_IMPLEMENTATION
-#include "stb_ds.h"
 
 int main(int argc, char **argv) {
   if (argc == 1) {
@@ -23,13 +21,10 @@ int main(int argc, char **argv) {
     const char *buffer = read_file(argv[2]);
 
     lexer = Lexer_init(buffer);
-    Token token;
-    do {
-      token = Lexer_scanToken(lexer);
-      arrput(tokens, token);
-    } while (token.type != TOKEN_EOF);
 
-    for (int i = 0; i < arrlen(tokens); i++) {
+    usize tokens_len = 0;
+    tokens = Lexer_scanTokens(lexer, &tokens_len);
+    for (int i = 0; i < tokens_len; i++) {
       Token token = tokens[i];
       print_token(&token);
       if (token.type == TOKEN_ERROR || token.type == TOKEN_EOF) {

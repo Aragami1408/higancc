@@ -23,6 +23,7 @@ typedef enum {
 
   // Keywords.
   TOKEN_KW_INT, TOKEN_KW_VOID, TOKEN_KW_RETURN,
+  TOKEN_KW_IF,
 
   TOKEN_ERROR, TOKEN_EOF
 

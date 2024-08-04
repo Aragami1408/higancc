@@ -2,6 +2,7 @@
 #define HIGANCC_LEXER_H
 
 #include "token.h"
+#include "common.h"
 
 typedef struct {
   const char *start;
@@ -10,7 +11,7 @@ typedef struct {
 } Lexer;
 
 Lexer *Lexer_init(const char *source);
-void Lexer_scanTokens(Lexer *lexer);
+Token *Lexer_scanTokens(Lexer *lexer, usize *len);
 Token Lexer_scanToken(Lexer *lexer);
 
 void Lexer_free(Lexer *lexer);
