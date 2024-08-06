@@ -71,6 +71,9 @@ static void skip_whitespace(Lexer *lexer) {
       case '/':
         if (peek_next(lexer) == '*') {
           while (!is_at_end(lexer)) {
+            if (peek(lexer) == '\n') {
+              lexer->line++;
+            }
             if (peek(lexer) == '*' && peek_next(lexer) == '/') {
               advance(lexer);
               advance(lexer);
@@ -136,6 +139,14 @@ static TokenType check_keyword(const Lexer *lexer, int start, int length, const 
 
 static TokenType identifier_or_keyword_type(const Lexer *lexer) {
   switch (lexer->start[0]) {
+    case 'c': return check_keyword(lexer, 1, 3, "har", TOKEN_KW_CHAR);
+    case 'f':
+      if (lexer->current - lexer->start > 1) {
+        switch (lexer->start[1]) {
+          case 'l': return check_keyword(lexer, 2, 3, "oat", TOKEN_KW_FLOAT);
+        }
+      }
+      break;
     case 'i': 
       if (lexer->current - lexer->start > 1) {
         switch (lexer->start[1]) {
@@ -144,8 +155,8 @@ static TokenType identifier_or_keyword_type(const Lexer *lexer) {
         }
       }
       break;
-    case 'v': return check_keyword(lexer, 1, 3, "oid", TOKEN_KW_VOID);
     case 'r': return check_keyword(lexer, 1, 5, "eturn", TOKEN_KW_RETURN);
+    case 'v': return check_keyword(lexer, 1, 3, "oid", TOKEN_KW_VOID);
   }
   return TOKEN_IDENTIFIER;
 }
