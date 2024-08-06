@@ -3,6 +3,7 @@
 
 #include "token.h"
 #include "common.h"
+#include "ast.h"
 
 typedef struct {
   Token *tokens;
@@ -10,5 +11,7 @@ typedef struct {
 } Parser;
 
 Parser *Parser_init(Token *tokens);
+AST *Parser_parse(Parser *parser);
+void Parser_destroy(Parser *parser);
 
 #endif
