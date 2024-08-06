@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 char *read_file(const char *path) {
   FILE *file = fopen(path, "rb");
@@ -31,4 +32,30 @@ char *read_file(const char *path) {
 
   fclose(file);
   return buffer;
+}
+
+char *substring(const char *str, int start, int length) {
+  if (str == NULL || start < 0 || length <= 0) {
+    return NULL;
+  }
+
+  int str_len = strlen(str);
+
+  if (start >= str_len) {
+    return NULL;
+  }
+
+  if ((start + length) > str_len) {
+    length = str_len - start;
+  }
+
+  char *result = (char*)malloc((length+1) * sizeof(char));
+  if (result == NULL) {
+    return NULL;
+  }
+
+  strncpy(result, str+start, length);
+  result[length] = '\0';
+
+  return result;
 }
