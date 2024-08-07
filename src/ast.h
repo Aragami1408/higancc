@@ -5,9 +5,6 @@
 
 typedef struct AST AST;
 
-typedef struct {
-} ASTFunction;
-
 struct AST {
   enum {
     AST_FUNCTION,
@@ -37,7 +34,6 @@ void ast_free(AST *ptr);
 
 #define AST_NEW(tag, ...) \
   ast_new((AST){tag, {.tag = (struct tag){__VA_ARGS__}}})
-
 
 
 #endif
