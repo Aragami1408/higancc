@@ -5,14 +5,6 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#ifdef NDEBUG
-#undef DEBUG_PRINT_CODE
-#undef DEBUG_TRACE_EXECUTION
-#else
-#define DEBUG_PRINT_CODE
-#define DEBUG_TRACE_EXECUTION
-#endif
-
 #define U8_COUNT (UINT8_MAX + 1)
 
 typedef int8_t i8;

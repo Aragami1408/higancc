@@ -5,7 +5,7 @@ void Options_printHelp() {
   printf("Usage: program [OPTIONS]\n");
   printf("OPTIONS:\n");
   printf("  --lexer         Print the tokens and exit\n");
-  printf("  --parser        Print the Abstract Syntax Tree only\n");
+  printf("  --parse        Print the Abstract Syntax Tree only\n");
   printf("  -S              Emit assembly only\n");
   printf("  -o <file>       Output file name\n");
   printf("  --help          Display this message\n");
@@ -15,7 +15,7 @@ Options Options_parse(int argc, char **argv) {
 
   static struct option long_options[] = {
     {"lexer", no_argument, 0, 'l'},
-    {"parser", no_argument, 0, 'p'},
+    {"parse", no_argument, 0, 'p'},
     {"help", no_argument, 0, 'h'},
     {0, 0, 0, 0}
   };

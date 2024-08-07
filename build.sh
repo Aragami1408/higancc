@@ -57,7 +57,7 @@ usage() {
 
 if [ -z "$2" ]
 then
-  echo "No second argument supplied, assume gcc"
+  echo "No third argument supplied, assume gcc"
   CC=gcc
 fi
 

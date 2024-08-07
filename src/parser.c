@@ -1,8 +1,11 @@
+
+#include <stdarg.h>
+
 #include "parser.h"
 #include "ast.h"
 #include "utils.h"
 
-#include <stdarg.h>
+#include "stb_ds.h"
 
 // HELPER FUNCTIONS
 // ----------------
@@ -46,6 +49,12 @@ static bool match(Parser *parser, usize count, ...) {
   return false;
 }
 
+static void error(const Parser *parser, const char *msg) {
+  Token current_token = peek(parser);
+  fprintf(stderr, "[PARSER ERROR - line %d] %s\n", current_token.line, msg);
+  exit(1);
+}
+
 // RECURSIVE DESCENT PARSING
 // -------------------------
 
@@ -56,47 +65,40 @@ AST *parse_exp(Parser *parser);
 
 AST *parse_function(Parser *parser) {
   if (!(check(parser, TOKEN_KW_INT) || check(parser, TOKEN_KW_FLOAT))) {
-    fprintf(stderr, "Expect 'int' or 'float' before function name.\n");
-    exit(1);
+    error(parser, "Expect 'int' or 'float' before function name.");
   }
   advance(parser);
 
   if (!check(parser, TOKEN_IDENTIFIER)) {
-    fprintf(stderr, "Expect valid function name after 'int'\n");
-    exit(1);
+    error(parser, "Expect valid function name after 'int'");
   }
   Token function_name = peek(parser);
   advance(parser);
 
   if (!check(parser, TOKEN_LEFT_PAREN)) {
-    fprintf(stderr, "Expect '(' after function name\n");
-    exit(1);
+    error(parser, "Expect '(' after function name");
   }
   advance(parser);
 
   if (!check(parser, TOKEN_KW_VOID)) {
-    fprintf(stderr, "Expect 'void' after '('\n");
-    exit(1);
+    error(parser, "Expect 'void' after '('");
   }
   advance(parser);
 
   if (!check(parser, TOKEN_RIGHT_PAREN)) {
-    fprintf(stderr, "Expect ')' after 'void'\n");
-    exit(1);
+    error(parser, "Expect ')' after 'void'");
   }
   advance(parser);
 
   if (!check(parser, TOKEN_LEFT_BRACE)) {
-    fprintf(stderr, "Expect '{' after ')'\n");
-    exit(1);
+    error(parser, "Expect '{' after ')'");
   }
   advance(parser);
 
   AST *statement = parse_statement(parser);
 
   if (!check(parser, TOKEN_RIGHT_BRACE)) {
-    fprintf(stderr, "Expect '}' after statement\n");
-    exit(1);
+    error(parser, "Expect '}' after statement");
   }
   advance(parser);
 
@@ -106,15 +108,13 @@ AST *parse_function(Parser *parser) {
 
 AST *parse_statement(Parser *parser) {
   if (!check(parser, TOKEN_KW_RETURN)) {
-    fprintf(stderr, "Expect 'return' before expression.\n");
-    exit(1);
+    error(parser, "Expect 'return' before expression.");
   }
   advance(parser);
   AST *return_val = parse_exp(parser);
   advance(parser);
   if (!check(parser, TOKEN_SEMICOLON)) {
-    fprintf(stderr, "Expect ';' after expression.\n");
-    exit(1);
+    error(parser, "Expect ';' after expression.");
   }
   advance(parser);
   return AST_NEW(AST_RETURN, return_val);
@@ -128,8 +128,7 @@ AST *parse_exp(Parser *parser) {
     return AST_NEW(AST_EXP, substring(peek(parser).start, 1, peek(parser).length-2));
   }
   else {
-    fprintf(stderr, "Expression must be a number.");
-    exit(1);
+    error(parser, "Expression must be a number.");
   }
 }
 
@@ -142,8 +141,18 @@ Parser *Parser_init(Token *tokens) {
   return parser;
 }
 
-AST *Parser_parse(Parser *parser) {
-  return parse_function(parser);
+AST *Parser_parse(Parser *parser, usize *len) {
+  AST *asts = NULL;
+
+  AST *ast = NULL;
+  while (!is_at_end(parser)) {
+    ast = parse_function(parser);
+    arrput(asts, *ast);
+  }
+
+  *len = arrlenu(asts);
+
+  return asts;
 }
 
 void Parser_destroy(Parser *parser) {

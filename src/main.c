@@ -1,12 +1,12 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "common.h"
 #include "options.h"
 #include "utils.h"
 #include "lexer.h"
 #include "parser.h"
 #include "ast.h"
-
 
 Lexer *lexer = NULL;
 
@@ -16,6 +16,7 @@ usize tokens_len = 0;
 Parser *parser = NULL;
 
 AST *global_ast = NULL;
+usize asts_len = 0;
 
 #ifndef NDEBUG
 void lexer_log() {
@@ -24,6 +25,7 @@ void lexer_log() {
     exit(1);
   }
   printf("LEXER DEBUG\n");
+  printf("-----------\n");
   printf("Token list: \n");
 
   for (int i = 0; i < tokens_len; i++) {
@@ -37,8 +39,15 @@ void lexer_log() {
 
 void parser_log() {
   printf("PARSER DEBUG\n");
-  global_ast = Parser_parse(parser);
-  ast_print(global_ast);
+  printf("------------\n");
+  printf("Program(\n");
+  for (int i = 0; i < asts_len; i++) {
+    AST ast = global_ast[i];
+    printf("\t");
+    ast_print(&ast);
+    printf("\n");
+  }
+  printf("\n)");
 }
 
 #endif
@@ -56,7 +65,9 @@ int main(int argc, char **argv) {
 
   lexer = Lexer_init(buffer);
   tokens = Lexer_scanTokens(lexer, &tokens_len);
+
   parser = Parser_init(tokens);
+  global_ast = Parser_parse(parser, &asts_len);
 
   for (int i = 0; i < tokens_len; i++) {
     Token token = tokens[i];

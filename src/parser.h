@@ -5,13 +5,14 @@
 #include "common.h"
 #include "ast.h"
 
+
 typedef struct {
   Token *tokens;
   usize current;
 } Parser;
 
 Parser *Parser_init(Token *tokens);
-AST *Parser_parse(Parser *parser);
+AST *Parser_parse(Parser *parser, usize *len);
 void Parser_destroy(Parser *parser);
 
 #endif
