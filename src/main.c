@@ -43,11 +43,11 @@ void parser_log() {
   printf("Program(\n");
   for (int i = 0; i < asts_len; i++) {
     AST ast = global_ast[i];
-    printf("\t");
+    printf("    ");
     ast_print(&ast);
     printf("\n");
   }
-  printf("\n)");
+  printf(")\n");
 }
 
 #endif
