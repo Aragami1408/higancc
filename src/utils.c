@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
 
 char *read_file(const char *path) {
   FILE *file = fopen(path, "rb");
@@ -58,4 +59,26 @@ char *substring(const char *str, int start, int length) {
   result[length] = '\0';
 
   return result;
+}
+
+int str_to_num(const char *str, void *result, char type) {
+  char *endptr;
+  errno = 0;
+
+  switch (type) {
+    case 'd':
+      *(double *)result = strtod(str, &endptr);
+      break;
+    case 'i':
+      *(int *)result = (int)strtol(str, &endptr, 10);
+      break;
+    default:
+      return 1; // Invalid type
+  }
+
+  if (errno != 0 || *endptr != '\0') {
+    return 1;
+  }
+
+  return 0;
 }
