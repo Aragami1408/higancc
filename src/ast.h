@@ -23,7 +23,7 @@ struct AST {
     } AST_RETURN;
 
     struct AST_EXP {
-      const char *num;
+      const char *data;
     } AST_EXP;
   } data;
 };

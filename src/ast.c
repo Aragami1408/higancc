@@ -27,7 +27,7 @@ void ast_print(AST *ptr) {
 
   case AST_EXP: {
     struct AST_EXP data = ast.data.AST_EXP;
-    printf("Constant(%s", data.num); 
+    printf("Constant(%s", data.data);
     printf(")");
   } break;
   }
@@ -47,7 +47,7 @@ void ast_free(AST *ptr) {
   } break;
 
   case AST_EXP: {
-    struct AST_EXP data = ast.data.AST_EXP;
+    // struct AST_EXP data = ast.data.AST_EXP;
   } break;
   }
 }

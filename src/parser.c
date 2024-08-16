@@ -32,11 +32,12 @@ static bool check(const Parser *parser, TokenType type) {
   return peek(parser).type == type;
 }
 
+/*
 static bool match(Parser *parser, usize count, ...) {
   va_list args; 
   va_start(args, count);
 
-  for (int i = 0; i < count; i++) {
+  for (usize i = 0; i < count; i++) {
     TokenType type = va_arg(args, TokenType);
     if (check(parser, type)) {
       advance(parser);
@@ -48,6 +49,7 @@ static bool match(Parser *parser, usize count, ...) {
   va_end(args);
   return false;
 }
+*/
 
 static void error(const Parser *parser, const char *msg) {
   Token current_token = peek(parser);
@@ -130,6 +132,7 @@ AST *parse_exp(Parser *parser) {
   else {
     error(parser, "Expression must be a number.");
   }
+  return NULL;
 }
 
 // PUBLIC METHODS

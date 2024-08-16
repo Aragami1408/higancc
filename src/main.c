@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <getopt.h>
 
 #include "common.h"
 #include "utils.h"
@@ -21,7 +22,7 @@ void print_usage(const char* program_name) {
 }
 
 void print_tokens(Token *tokens, usize len) {
-  for (int i = 0; i < len; i++) {
+  for (usize i = 0; i < len; i++) {
     Token token = tokens[i];
     print_token(&token);
     if (token.type == TOKEN_ERROR || token.type == TOKEN_EOF) {
@@ -32,38 +33,42 @@ void print_tokens(Token *tokens, usize len) {
 
 int main(int argc, char *argv[]) {
   char *input_file = NULL;
-  char *output_file = "a.out";
-  bool lex_only = false;
-  bool parse_only = false;
-  bool codegen_only = false;
+  const char *output_file = "a.out";
+  bool do_lex = false;
+  bool do_parse = false;
+  bool do_codegen = false;
 
-  for (int i = 1; i < argc; i++) {
-    if (strcmp(argv[i], "-o") == 0 && i + 1 < argc) {
-      output_file = argv[++i];
-    }
-    else if (strcmp(argv[i], "--lex") == 0) {
-      lex_only = true;
-    }
-    else if (strcmp(argv[i], "--parse") == 0) {
-      parse_only = true;
-    }
-    else if (strcmp(argv[i], "-S") == 0) {
-      codegen_only = true;
-    }
-    else if (input_file == NULL) {
-      input_file = argv[i];
-    }
-    else {
-      fprintf(stderr, "Unknown argument: %s\n", argv[i]);
-      print_usage(argv[0]);
-      return 1;
+  static struct option long_options[] = {
+    {"lex",     no_argument,       0, 'l'},
+    {"parse",   no_argument,       0, 'p'},
+    {"codegen", no_argument,       0, 'c'},
+    {"output",  required_argument, 0, 'o'},
+    {"help",    no_argument,       0, 'h'},
+    {0, 0, 0, 0}
+  };
+
+  int opt;
+  while ((opt = getopt_long(argc, argv, "lpco:h", long_options, NULL)) != -1) {
+    switch (opt) {
+      case 'l': do_lex = true; break;
+      case 'p': do_parse = true; break;
+      case 'c': do_codegen = true; break;
+      case 'o': output_file = optarg; break;
+      case 'h': print_usage(argv[0]); return 0;
+      default: fprintf(stderr, "Try '%s --help' for more information.\n", argv[0]); return 1;
     }
   }
 
-  if (input_file == NULL) {
-    fprintf(stderr, "No input file specified\n");
+  if (optind >= argc) {
+    fprintf(stderr, "Error: No input file specified\n");
     print_usage(argv[0]);
     return 1;
+  }
+
+  input_file = argv[optind];
+
+  if (!do_lex && !do_parse && !do_codegen) {
+    do_lex = do_parse = do_codegen = true;
   }
 
   char *source = read_file(input_file);  
@@ -78,7 +83,7 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
-  for (int i = 0; i < token_list_size; i++) {
+  for (usize i = 0; i < token_list_size; i++) {
     Token token = tokens[i];
     if (token.type == TOKEN_ERROR) {
       fprintf(stderr, "[LEXER ERROR - line %d] %.*s\n", token.line, token.length, token.start);
@@ -86,9 +91,10 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  if (lex_only) {
+  if (do_lex) {
     printf("[LEX ONLY]\n");
     print_tokens(tokens, token_list_size);
+    printf("\n");
   }
 
   Parser *parser = Parser_init(tokens);
@@ -103,9 +109,10 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
-  if (parse_only) {
+  if (do_parse) {
     printf("[PARSING ONLY]\n");
     ast_print(global_ast);
+    printf("\n");
   }
 
   // TODO: implement proper codegen 
@@ -115,9 +122,10 @@ int main(int argc, char *argv[]) {
   ASMNode_addInstruction(function, ASMNode_createRet());
   ASMNode* program = ASMNode_createProgram(function);
 
-  if (codegen_only) {
+  if (do_codegen) {
     printf("[CODEGEN ONLY]\n");
     print_asm_tree(program, 0);
+    printf("\n");
   }
 
   FILE *out_file = fopen(output_file, "w");

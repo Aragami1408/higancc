@@ -52,7 +52,7 @@ ASMNode* ASMNode_createProgram(ASMNode* function);
 ASMNode* ASMNode_createFunction(const char* name);
 void ASMNode_addInstruction(ASMNode* function, ASMNode* instruction);
 ASMNode* ASMNode_createMov(ASMNode* src, ASMNode* dst);
-ASMNode* ASMNode_createRet();
+ASMNode* ASMNode_createRet(void);
 ASMNode* ASMNode_createImm(int value);
 ASMNode* ASMNode_createRegister(RegisterType reg);
 
