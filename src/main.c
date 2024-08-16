@@ -7,91 +7,70 @@
 #include "lexer.h"
 #include "parser.h"
 #include "ast.h"
+#include "asm_tree.h"
 
-Lexer *lexer = NULL;
+#include "stb_ds.h"
+#define STB_DS_IMPLEMENTATION
 
-Token *tokens = NULL;
-usize tokens_len = 0;
+void print_usage(const char *program_name) {
+  printf("Usage: %s [options] input_file\n", program_name);
+  printf("Options:\n");
+  printf("  -o <file>    Specify output file\n");
+  printf("  --lex        Perform lexical analysis only and print tokens\n");
+  printf("  --parse      Perform lexical and syntax analysis and print AST\n");
+  printf("  -S           Perform lexical, syntax analysis and code generation, print ASM tree\n");
+}
 
-Parser *parser = NULL;
+int main(int argc, char *argv[]) {
+  char *input_file = NULL;
+  char *output_file = "a.out";
+  bool lex_only = false;
+  bool parse_only = false;
+  bool codegen_only = false;
 
-AST *global_ast = NULL;
-usize asts_len = 0;
-
-#ifndef NDEBUG
-void lexer_log() {
-  if (lexer == NULL) {
-    fprintf(stderr, "The lexer hasn't been properly initialized\n");
-    exit(1);
-  }
-  printf("LEXER DEBUG\n");
-  printf("-----------\n");
-  printf("Token list: \n");
-
-  for (int i = 0; i < tokens_len; i++) {
-    Token token = tokens[i];
-    print_token(&token);
-    if (token.type == TOKEN_ERROR || token.type == TOKEN_EOF) {
-      break;
+  for (int i = 1; i < argc; i++) {
+    if (strcmp(argv[i], "-o") == 0 && i + 1 < argc) {
+      output_file = argv[++i];
+    }
+    else if (strcmp(argv[i], "--lex") == 0) {
+      lex_only = true;
+    }
+    else if (strcmp(argv[i], "--parse") == 0) {
+      parse_only = true;
+    }
+    else if (strcmp(argv[i], "-S") == 0) {
+      codegen_only = true;
+    }
+    else {
+      fprintf(stderr, "Unknown argument: %s\n", argv[i]);
+      print_usage(argv[0]);
+      return 1;
     }
   }
-}
 
-void parser_log() {
-  printf("PARSER DEBUG\n");
-  printf("------------\n");
-  printf("Program(\n");
-  for (int i = 0; i < asts_len; i++) {
-    AST ast = global_ast[i];
-    printf("    ");
-    ast_print(&ast);
-    printf("\n");
-  }
-  printf(")\n");
-}
-
-#endif
-
-int main(int argc, char **argv) {
-  if (argc == 1) {
-    printf("higancc: fatal error: no input files\n");
-    printf("compilation terminated\n");
+  if (input_file == NULL) {
+    fprintf(stderr, "No input file specified\n");
+    print_usage(argv[0]);
     return 1;
   }
 
-  Options opts = Options_parse(argc, argv);
+  char *source = read_file(input_file);  
 
-  const char *buffer = read_file(argv[argc-1]);
+  Lexer *lexer = Lexer_init(source);
 
-  lexer = Lexer_init(buffer);
-  tokens = Lexer_scanTokens(lexer, &tokens_len);
-
-  parser = Parser_init(tokens);
-  global_ast = Parser_parse(parser, &asts_len);
-
-  for (int i = 0; i < tokens_len; i++) {
-    Token token = tokens[i];
-    if (token.type == TOKEN_ERROR) {
-      fprintf(stderr, "[LEXER ERROR - line %d] %.*s\n", token.line, token.length, token.start);
-      exit(1);
-    }
+  usize token_list_size = 0;
+  Token *tokens = Lexer_scanTokens(lexer, &token_list_size);
+  if (tokens == NULL) {
+    fprintf(stderr, "Lexical analysis failed\n");
+    return 1;
   }
 
-  if (opts.lexer) {
-    lexer_log();
-  }
-  if (opts.parser) {
-    parser_log();
-  }
-  if (opts.emit_assembly) {
-    printf("Here's the Assembly: \n");
+  if (lex_only) {
+    print_tokens(tokens);
+    arrfree(tokens);  
+    Lexer_free(lexer);
+    return 0;
   }
 
-  if (opts.output_file) {
-    printf("Compile to '%s'\n", opts.output_file);
-  }
-
-  Lexer_free(lexer);
-
-  return 0;
+  
 }
