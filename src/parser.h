@@ -13,6 +13,6 @@ typedef struct {
 
 Parser *Parser_init(Token *tokens);
 AST *Parser_parse(Parser *parser, usize *len);
-void Parser_destroy(Parser *parser);
+void Parser_free(Parser *parser);
 
 #endif

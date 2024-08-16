@@ -155,7 +155,7 @@ AST *Parser_parse(Parser *parser, usize *len) {
   return asts;
 }
 
-void Parser_destroy(Parser *parser) {
+void Parser_free(Parser *parser) {
   free(parser);
 }
 
