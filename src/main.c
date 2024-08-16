@@ -9,15 +9,15 @@
 #include "asm_tree.h"
 
 #include "stb_ds.h"
-#define STB_DS_IMPLEMENTATION
 
-void print_usage(const char *program_name) {
-  printf("Usage: %s [options] input_file\n", program_name);
+void print_usage(const char* program_name) {
+  printf("Usage: %s [options] <input_file>\n", program_name);
   printf("Options:\n");
-  printf("  -o <file>    Specify output file\n");
-  printf("  --lex        Perform lexical analysis only and print tokens\n");
-  printf("  --parse      Perform lexical and syntax analysis and print AST\n");
-  printf("  -S           Perform lexical, syntax analysis and code generation, print ASM tree\n");
+  printf("  -l, --lex               Perform lexical analysis and print tokens\n");
+  printf("  -p, --parse             Perform parsing and print AST\n");
+  printf("  -c, --codegen           Perform code generation and print assembly tree\n");
+  printf("  -o, --output <file>     Specify output file (default: a.out)\n");
+  printf("  -h, --help              Display this help message\n");
 }
 
 void print_tokens(Token *tokens, usize len) {
