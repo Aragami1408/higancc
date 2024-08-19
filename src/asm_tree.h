@@ -20,8 +20,8 @@ typedef struct ASMNode ASMNode;
 typedef struct ASMInstList ASMInstList;
 
 struct ASMInstList {
-  struct ASMNode* instruction;
-  struct ASMInstList* next;
+  ASMNode* instruction;
+  ASMInstList* next;
 };
 
 struct ASMNode {
