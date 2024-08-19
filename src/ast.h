@@ -49,7 +49,7 @@ AST *AST_createFunction(const Token *name, AST *body);
 AST *AST_createReturn(AST *exp);
 AST *AST_createExp(const char *data);
 
-void print_ast(const AST *ptr, int depth);
+void AST_print(const AST *ptr, int depth);
 
 void AST_free(AST *ptr);
 

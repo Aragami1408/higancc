@@ -52,7 +52,7 @@ AST *AST_createExp(const char *data) {
   return node;
 }
 
-void print_ast(const AST *ptr, int depth) {
+void AST_print(const AST *ptr, int depth) {
   AST ast = *ptr;
 
 #define TAB for (int i = 0; i < depth; i++) printf(" ");
@@ -67,7 +67,7 @@ void print_ast(const AST *ptr, int depth) {
     printf("Program(\n");
     ASTList *curr = program.functions;
     while (curr != NULL) {
-      print_ast(curr->node, depth+1);
+      AST_print(curr->node, depth+1);
       curr = curr->next;
     }
     TAB
@@ -77,14 +77,14 @@ void print_ast(const AST *ptr, int depth) {
     struct AST_FUNCTION function = ast.data.function;
     Token name = function.name;
     printf("Function(name=\"%.*s\",body=\n", name.length, name.start);
-    print_ast(function.body, depth+1);
+    AST_print(function.body, depth+1);
     TAB
     printf(")\n");
   } break;
   case AST_RETURN: {
     struct AST_RETURN ret = ast.data.ret;
     printf("Return(\n");
-    print_ast(ret.exp, depth+1);
+    AST_print(ret.exp, depth+1);
     TAB
     printf(")\n");
   } break;

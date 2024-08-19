@@ -110,7 +110,7 @@ int main(int argc, char *argv[]) {
 
   if (do_parse) {
     printf("[PARSING ONLY]\n");
-    print_ast(global_ast, 0);
+    AST_print(global_ast, 0);
     printf("\n");
   }
 
