@@ -98,24 +98,23 @@ int main(int argc, char *argv[]) {
   }
 
   Parser *parser = Parser_init(tokens);
-  usize global_ast_size = 0;
-  AST *global_ast = Parser_parse(parser, &global_ast_size);
+  AST *global_ast = Parser_parse(parser);
   if (global_ast == NULL) {
     fprintf(stderr, "Parsing failed\n"); 
     arrfree(tokens);  
     Lexer_free(lexer);
-    ast_free(global_ast);
+    AST_free(global_ast);
     Parser_free(parser);
     return 1;
   }
 
   if (do_parse) {
     printf("[PARSING ONLY]\n");
-    ast_print(global_ast);
+    print_ast(global_ast, 0);
     printf("\n");
   }
 
-  // TODO: implement proper codegen 
+  // TODO(higanbana): implement proper codegen 
   ASMNode* function = ASMNode_createFunction("main");
   ASMNode* mov_inst = ASMNode_createMov(ASMNode_createImm(42), ASMNode_createRegister(REG_EAX));
   ASMNode_addInstruction(function, mov_inst);
@@ -133,7 +132,7 @@ int main(int argc, char *argv[]) {
     perror("Error opening output file");
     arrfree(tokens);  
     Lexer_free(lexer);
-    ast_free(global_ast);
+    AST_free(global_ast);
     Parser_free(parser);
     ASMNode_free(program);
     return 1;
@@ -141,7 +140,7 @@ int main(int argc, char *argv[]) {
 
   arrfree(tokens);  
   Lexer_free(lexer);
-  ast_free(global_ast);
+  AST_free(global_ast);
   Parser_free(parser);
   ASMNode_free(program);
 

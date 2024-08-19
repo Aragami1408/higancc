@@ -103,9 +103,7 @@ AST *parse_function(Parser *parser) {
     error(parser, "Expect '}' after statement");
   }
   advance(parser);
-
-  return AST_NEW(AST_FUNCTION, function_name, statement);
-
+  return AST_createFunction(&function_name, statement);
 }
 
 AST *parse_statement(Parser *parser) {
@@ -119,15 +117,15 @@ AST *parse_statement(Parser *parser) {
     error(parser, "Expect ';' after expression.");
   }
   advance(parser);
-  return AST_NEW(AST_RETURN, return_val);
+  return AST_createReturn(return_val);
 }
 
 AST *parse_exp(Parser *parser) {
   if (check(parser, TOKEN_INT) || check(parser, TOKEN_FLOAT)) {
-    return AST_NEW(AST_EXP, substring(peek(parser).start, 0, peek(parser).length));
+    return AST_createExp(substring(peek(parser).start, 0, peek(parser).length));
   }
   else if (check(parser, TOKEN_CHAR)) {
-    return AST_NEW(AST_EXP, substring(peek(parser).start, 1, peek(parser).length-2));
+    return AST_createExp(substring(peek(parser).start, 1, peek(parser).length - 2));
   }
   else {
     error(parser, "Expression must be a number.");
@@ -144,6 +142,20 @@ Parser *Parser_init(Token *tokens) {
   return parser;
 }
 
+AST *Parser_parse(Parser *parser) {
+  AST *program = AST_createProgram();
+
+  AST *function = NULL;
+
+  while (!is_at_end(parser)) {
+    function = parse_function(parser);
+    AST_addFunctionToProgram(program, function);
+  }
+
+  return program;
+}
+
+/*
 AST *Parser_parse(Parser *parser, usize *len) {
   AST *asts = NULL;
 
@@ -157,8 +169,8 @@ AST *Parser_parse(Parser *parser, usize *len) {
 
   return asts;
 }
+*/
 
 void Parser_free(Parser *parser) {
   free(parser);
 }
-

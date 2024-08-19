@@ -109,7 +109,7 @@ static Token string(Lexer *lexer) {
 }
 
 static Token character(Lexer *lexer) {
-  // TODO: only capture one character enclosed in '', otherwise return error token
+  // TODO(higanbana): only capture one character enclosed in '', otherwise return error token
   while (peek(lexer) != '\'' && !is_at_end(lexer)) {
     if (peek(lexer) == '\n') lexer->line++;
     advance(lexer);
