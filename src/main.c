@@ -8,6 +8,7 @@
 #include "parser.h"
 #include "ast.h"
 #include "asm_tree.h"
+#include "memory.h"
 
 #include "stb_ds.h"
 
@@ -71,7 +72,11 @@ int main(int argc, char *argv[]) {
     do_lex = do_parse = do_codegen = true;
   }
 
-  char *source = read_file(input_file);  
+  u8 backing_buffer[BACKING_BUFFER_LENGTH];
+  ArenaAllocator allocator;
+  ArenaAllocator_init(&allocator, backing_buffer, BACKING_BUFFER_LENGTH);
+
+  char *source = read_file(&allocator, input_file);  
 
   Lexer *lexer = Lexer_init(source);
   usize token_list_size = 0;
@@ -97,7 +102,7 @@ int main(int argc, char *argv[]) {
     printf("\n");
   }
 
-  Parser *parser = Parser_init(tokens);
+  Parser *parser = Parser_init(&allocator, tokens);
   AST *global_ast = Parser_parse(parser);
   if (global_ast == NULL) {
     fprintf(stderr, "Parsing failed\n"); 
@@ -138,10 +143,11 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
+  ArenaAllocator_freeAll(&allocator);
+
   arrfree(tokens);  
   Lexer_free(lexer);
   AST_free(global_ast);
-  Parser_free(parser);
   ASMNode_free(program);
 
   return 0; 

@@ -5,7 +5,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#define U8_COUNT (UINT8_MAX + 1)
+#define BACKING_BUFFER_LENGTH 2048
 
 typedef int8_t i8;
 typedef int16_t i16;

@@ -122,10 +122,10 @@ AST *parse_statement(Parser *parser) {
 
 AST *parse_exp(Parser *parser) {
   if (check(parser, TOKEN_INT) || check(parser, TOKEN_FLOAT)) {
-    return AST_createExp(substring(peek(parser).start, 0, peek(parser).length));
+    return AST_createExp(substring(parser->allocator, peek(parser).start, 0, peek(parser).length));
   }
   else if (check(parser, TOKEN_CHAR)) {
-    return AST_createExp(substring(peek(parser).start, 1, peek(parser).length - 2));
+    return AST_createExp(substring(parser->allocator, peek(parser).start, 1, peek(parser).length - 2));
   }
   else {
     error(parser, "Expression must be a number.");
@@ -135,10 +135,11 @@ AST *parse_exp(Parser *parser) {
 
 // PUBLIC METHODS
 // --------------
-Parser *Parser_init(Token *tokens) {
-  Parser *parser = (Parser *)malloc(sizeof(Parser));
+Parser *Parser_init(ArenaAllocator *a, Token *tokens) {
+  Parser *parser = (Parser *)ArenaAllocator_alloc(a, sizeof(Parser));
   parser->tokens = tokens;
   parser->current = 0;
+  parser->allocator = a;
   return parser;
 }
 

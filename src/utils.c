@@ -6,7 +6,7 @@
 #include <string.h>
 #include <errno.h>
 
-char *read_file(const char *path) {
+char *read_file(ArenaAllocator *a, const char *path) {
   FILE *file = fopen(path, "rb");
   if (file == NULL) {
     fprintf(stderr, "Could not open file '%s'\n", path);
@@ -17,7 +17,7 @@ char *read_file(const char *path) {
   usize file_size = ftell(file);
   rewind(file);
 
-  char* buffer = (char*)malloc(file_size + 1);
+  char* buffer = (char*)ArenaAllocator_alloc(a, file_size + 1);
   if (buffer == NULL) {
     fprintf(stderr, "Not enough memory to read '%s'\n", path);
     exit(74);
@@ -35,7 +35,7 @@ char *read_file(const char *path) {
   return buffer;
 }
 
-char *substring(const char *str, int start, int length) {
+char *substring(ArenaAllocator *a, const char *str, int start, int length) {
   if (str == NULL || start < 0 || length <= 0) {
     return NULL;
   }
@@ -50,7 +50,7 @@ char *substring(const char *str, int start, int length) {
     length = str_len - start;
   }
 
-  char *result = (char*)malloc((length+1) * sizeof(char));
+  char *result = (char*)ArenaAllocator_alloc(a, (length+1) * sizeof(char));
   if (result == NULL) {
     return NULL;
   }
