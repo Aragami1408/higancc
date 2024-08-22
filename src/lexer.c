@@ -185,8 +185,8 @@ static Token number(Lexer *lexer) {
   return make_token(lexer, TOKEN_INT);
 }
 
-Lexer *Lexer_init(const char *source) {
-  Lexer *lexer = (Lexer *)malloc(sizeof(Lexer));
+Lexer *Lexer_init(ArenaAllocator *a, const char *source) {
+  Lexer *lexer = (Lexer *)ArenaAllocator_alloc(a, sizeof(Lexer));
   if (lexer == NULL) {
     fprintf(stderr, "Failed to allocate lexer\n");
     exit(1);
@@ -195,6 +195,7 @@ Lexer *Lexer_init(const char *source) {
   lexer->start = source;
   lexer->current = source;
   lexer->line = 1;
+  lexer->allocator = a;
 
   return lexer;
 }
@@ -253,6 +254,3 @@ Token Lexer_scanToken(Lexer *lexer) {
   return error_token(lexer, "Unexpected character.");
 }
 
-void Lexer_free(Lexer *lexer) {
-  free(lexer);
-}

@@ -2,6 +2,7 @@
 #define HIGANCC_ASM_TREE_H
 
 #include "common.h"
+#include "memory.h"
 
 typedef enum {
   ASM_PROGRAM,
@@ -47,16 +48,15 @@ struct ASMNode {
   } data;
 };
 
-ASMNode* ASMNode_createNode(ASMNodeType type);
-ASMNode* ASMNode_createProgram(ASMNode* function);
-ASMNode* ASMNode_createFunction(const char* name);
-void ASMNode_addInstruction(ASMNode* function, ASMNode* instruction);
-ASMNode* ASMNode_createMov(ASMNode* src, ASMNode* dst);
-ASMNode* ASMNode_createRet(void);
-ASMNode* ASMNode_createImm(int value);
-ASMNode* ASMNode_createRegister(RegisterType reg);
+ASMNode* ASMNode_createNode(ArenaAllocator *a, ASMNodeType type);
+ASMNode* ASMNode_createProgram(ArenaAllocator *a, ASMNode* function);
+ASMNode* ASMNode_createFunction(ArenaAllocator *a, const char* name);
+void ASMNode_addInstruction(ArenaAllocator *a, ASMNode* function, ASMNode* instruction);
+ASMNode* ASMNode_createMov(ArenaAllocator *a, ASMNode* src, ASMNode* dst);
+ASMNode* ASMNode_createRet(ArenaAllocator *a);
+ASMNode* ASMNode_createImm(ArenaAllocator *a, int value);
+ASMNode* ASMNode_createRegister(ArenaAllocator *a, RegisterType reg);
 
 void print_asm_tree(ASMNode *node, int depth);
 
-void ASMNode_free(ASMNode* node);
 #endif

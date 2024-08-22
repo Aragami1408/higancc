@@ -2,6 +2,7 @@
 #define HIGANCC_AST_H
 
 #include "token.h"
+#include "memory.h"
 
 typedef enum {
   AST_PROGRAM,
@@ -42,15 +43,13 @@ struct AST {
   } data;
 };
 
-AST *AST_createNode(ASTNodeType type);
-AST *AST_createProgram(void);
-void AST_addFunctionToProgram(AST *program, AST *function);
-AST *AST_createFunction(const Token *name, AST *body);
-AST *AST_createReturn(AST *exp);
-AST *AST_createExp(const char *data);
+AST *AST_createNode(ArenaAllocator *a, ASTNodeType type);
+AST *AST_createProgram(ArenaAllocator *a);
+void AST_addFunctionToProgram(ArenaAllocator *a, AST *program, AST *function);
+AST *AST_createFunction(ArenaAllocator *a, const Token *name, AST *body);
+AST *AST_createReturn(ArenaAllocator *a, AST *exp);
+AST *AST_createExp(ArenaAllocator *a, const char *data);
 
 void AST_print(const AST *ptr, int depth);
-
-void AST_free(AST *ptr);
 
 #endif

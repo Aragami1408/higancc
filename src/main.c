@@ -78,13 +78,13 @@ int main(int argc, char *argv[]) {
 
   char *source = read_file(&allocator, input_file);  
 
-  Lexer *lexer = Lexer_init(source);
+  Lexer *lexer = Lexer_init(&allocator, source);
   usize token_list_size = 0;
   Token *tokens = Lexer_scanTokens(lexer, &token_list_size);
   if (tokens == NULL) {
     fprintf(stderr, "Lexical analysis failed\n");
     arrfree(tokens);  
-    Lexer_free(lexer);
+    ArenaAllocator_freeAll(&allocator);
     return 1;
   }
 
@@ -107,9 +107,7 @@ int main(int argc, char *argv[]) {
   if (global_ast == NULL) {
     fprintf(stderr, "Parsing failed\n"); 
     arrfree(tokens);  
-    Lexer_free(lexer);
-    AST_free(global_ast);
-    Parser_free(parser);
+    ArenaAllocator_freeAll(&allocator);
     return 1;
   }
 
@@ -120,11 +118,11 @@ int main(int argc, char *argv[]) {
   }
 
   // TODO(higanbana): implement proper codegen 
-  ASMNode* function = ASMNode_createFunction("main");
-  ASMNode* mov_inst = ASMNode_createMov(ASMNode_createImm(42), ASMNode_createRegister(REG_EAX));
-  ASMNode_addInstruction(function, mov_inst);
-  ASMNode_addInstruction(function, ASMNode_createRet());
-  ASMNode* program = ASMNode_createProgram(function);
+  ASMNode* function = ASMNode_createFunction(&allocator, "main");
+  ASMNode* mov_inst = ASMNode_createMov(&allocator, ASMNode_createImm(&allocator, 42), ASMNode_createRegister(&allocator, REG_EAX));
+  ASMNode_addInstruction(&allocator, function, mov_inst);
+  ASMNode_addInstruction(&allocator, function, ASMNode_createRet(&allocator));
+  ASMNode* program = ASMNode_createProgram(&allocator, function);
 
   if (do_codegen) {
     printf("[CODEGEN ONLY]\n");
@@ -136,19 +134,12 @@ int main(int argc, char *argv[]) {
   if (out_file == NULL) {
     perror("Error opening output file");
     arrfree(tokens);  
-    Lexer_free(lexer);
-    AST_free(global_ast);
-    Parser_free(parser);
-    ASMNode_free(program);
+    ArenaAllocator_freeAll(&allocator);
     return 1;
   }
 
-  ArenaAllocator_freeAll(&allocator);
-
   arrfree(tokens);  
-  Lexer_free(lexer);
-  AST_free(global_ast);
-  ASMNode_free(program);
+  ArenaAllocator_freeAll(&allocator);
 
   return 0; 
 }

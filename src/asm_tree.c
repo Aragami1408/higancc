@@ -4,27 +4,27 @@
 #include <stdlib.h>
 
 
-ASMNode* ASMNode_createNode(ASMNodeType type) {
-  ASMNode* node = (ASMNode*)malloc(sizeof(ASMNode));
+ASMNode* ASMNode_createNode(ArenaAllocator *a, ASMNodeType type) {
+  ASMNode *node = (ASMNode*)ArenaAllocator_alloc(a, sizeof(ASMNode));
   node->type = type;
   return node;
 }
 
-ASMNode* ASMNode_createProgram(ASMNode* function) {
-  ASMNode *node = ASMNode_createNode(ASM_PROGRAM);
+ASMNode* ASMNode_createProgram(ArenaAllocator *a, ASMNode* function) {
+  ASMNode *node = ASMNode_createNode(a, ASM_PROGRAM);
   node->data.program.function = function; 
   return node;
 }
 
-ASMNode* ASMNode_createFunction(const char* name) {
-  ASMNode *node = ASMNode_createNode(ASM_FUNCTION);
+ASMNode* ASMNode_createFunction(ArenaAllocator *a, const char* name) {
+  ASMNode *node = ASMNode_createNode(a, ASM_FUNCTION);
   node->data.function.name = name; 
   node->data.function.instructions = NULL;
   return node;
 }
 
-void ASMNode_addInstruction(ASMNode* function, ASMNode* instruction) {
-  ASMInstList* new_inst = (ASMInstList*)malloc(sizeof(ASMInstList));
+void ASMNode_addInstruction(ArenaAllocator *a, ASMNode* function, ASMNode* instruction) {
+  ASMInstList *new_inst = (ASMInstList*)ArenaAllocator_alloc(a, sizeof(ASMInstList));
   new_inst->instruction = instruction;
   new_inst->next = NULL;
 
@@ -39,26 +39,26 @@ void ASMNode_addInstruction(ASMNode* function, ASMNode* instruction) {
   }
 }
 
-ASMNode* ASMNode_createMov(ASMNode* src, ASMNode* dst) {
-  ASMNode *node = ASMNode_createNode(ASM_MOV);
+ASMNode* ASMNode_createMov(ArenaAllocator *a, ASMNode* src, ASMNode* dst) {
+  ASMNode *node = ASMNode_createNode(a, ASM_MOV);
   node->data.mov.src = src; 
   node->data.mov.dst = dst;
   return node;
 }
 
-ASMNode* ASMNode_createRet() {
-  ASMNode *node = ASMNode_createNode(ASM_RET);
+ASMNode* ASMNode_createRet(ArenaAllocator *a) {
+  ASMNode *node = ASMNode_createNode(a, ASM_RET);
   return node;
 }
 
-ASMNode* ASMNode_createImm(int value) {
-  ASMNode *node = ASMNode_createNode(ASM_IMM);
+ASMNode* ASMNode_createImm(ArenaAllocator *a, int value) {
+  ASMNode *node = ASMNode_createNode(a, ASM_IMM);
   node->data.imm.value = value;
   return node;
 }
 
-ASMNode* ASMNode_createRegister(RegisterType reg) {
-  ASMNode *node = ASMNode_createNode(ASM_REGISTER);
+ASMNode* ASMNode_createRegister(ArenaAllocator *a, RegisterType reg) {
+  ASMNode *node = ASMNode_createNode(a, ASM_REGISTER);
   node->data.reg.reg = reg;
   return node;
 }
@@ -105,33 +105,4 @@ void print_asm_tree(ASMNode *node, int depth) {
   default:
       printf("Unknown node type\n");
   }
-}
-
-void ASMNode_free(ASMNode* node) {
-  if (node == NULL) return;
-
-  switch (node->type) {
-  case ASM_PROGRAM:
-    ASMNode_free(node->data.program.function);
-    break;
-  case ASM_FUNCTION: {
-    ASMInstList* curr = node->data.function.instructions;
-    while (curr != NULL) {
-      ASMInstList* next = curr->next;
-      ASMNode_free(curr->instruction);
-      free(curr);
-      curr = next;
-    }
-  } break;
-  case ASM_MOV:
-    ASMNode_free(node->data.mov.src);
-    ASMNode_free(node->data.mov.dst);
-    break;
-  case ASM_RET:
-  case ASM_IMM:
-  case ASM_REGISTER:
-    break;
-  }
-
-  free(node);
 }

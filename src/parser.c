@@ -1,4 +1,3 @@
-
 #include <stdarg.h>
 
 #include "parser.h"
@@ -103,7 +102,7 @@ AST *parse_function(Parser *parser) {
     error(parser, "Expect '}' after statement");
   }
   advance(parser);
-  return AST_createFunction(&function_name, statement);
+  return AST_createFunction(parser->allocator, &function_name, statement);
 }
 
 AST *parse_statement(Parser *parser) {
@@ -117,15 +116,15 @@ AST *parse_statement(Parser *parser) {
     error(parser, "Expect ';' after expression.");
   }
   advance(parser);
-  return AST_createReturn(return_val);
+  return AST_createReturn(parser->allocator, return_val);
 }
 
 AST *parse_exp(Parser *parser) {
   if (check(parser, TOKEN_INT) || check(parser, TOKEN_FLOAT)) {
-    return AST_createExp(substring(parser->allocator, peek(parser).start, 0, peek(parser).length));
+    return AST_createExp(parser->allocator, substring(parser->allocator, peek(parser).start, 0, peek(parser).length));
   }
   else if (check(parser, TOKEN_CHAR)) {
-    return AST_createExp(substring(parser->allocator, peek(parser).start, 1, peek(parser).length - 2));
+    return AST_createExp(parser->allocator, substring(parser->allocator, peek(parser).start, 1, peek(parser).length - 2));
   }
   else {
     error(parser, "Expression must be a number.");
@@ -144,34 +143,14 @@ Parser *Parser_init(ArenaAllocator *a, Token *tokens) {
 }
 
 AST *Parser_parse(Parser *parser) {
-  AST *program = AST_createProgram();
+  AST *program = AST_createProgram(parser->allocator);
 
   AST *function = NULL;
 
   while (!is_at_end(parser)) {
     function = parse_function(parser);
-    AST_addFunctionToProgram(program, function);
+    AST_addFunctionToProgram(parser->allocator, program, function);
   }
 
   return program;
-}
-
-/*
-AST *Parser_parse(Parser *parser, usize *len) {
-  AST *asts = NULL;
-
-  AST *ast = NULL;
-  while (!is_at_end(parser)) {
-    ast = parse_function(parser);
-    arrput(asts, *ast);
-  }
-
-  *len = arrlenu(asts);
-
-  return asts;
-}
-*/
-
-void Parser_free(Parser *parser) {
-  free(parser);
 }

@@ -2,22 +2,22 @@
 
 #include <stdlib.h>
 
-AST *AST_createNode(ASTNodeType type) {
-  AST *node = (AST*) malloc(sizeof(AST));
+AST *AST_createNode(ArenaAllocator *a, ASTNodeType type) {
+  AST *node = (AST*) ArenaAllocator_alloc(a, sizeof(AST));
   node->tag = type;
   return node;
 }
 
-AST *AST_createProgram(void) {
-  AST *node = AST_createNode(AST_PROGRAM);
+AST *AST_createProgram(ArenaAllocator *a) {
+  AST *node = AST_createNode(a, AST_PROGRAM);
   node->data.program.functions = NULL;
   return node;
 }
 
-void AST_addFunctionToProgram(AST *program, AST *function) {
+void AST_addFunctionToProgram(ArenaAllocator *a, AST *program, AST *function) {
   // TODO(higanbana): considering const-correctness of 'function' param
   // as well as ASTList's node
-  ASTList *new_ast = (ASTList *)malloc(sizeof(ASTList));
+  ASTList *new_ast = (ASTList *)ArenaAllocator_alloc(a, sizeof(ASTList));
   new_ast->node = function;
   new_ast->next = NULL;
 
@@ -33,21 +33,21 @@ void AST_addFunctionToProgram(AST *program, AST *function) {
   }
 }
 
-AST *AST_createFunction(const Token *name, AST *body) {
-  AST *node = AST_createNode(AST_FUNCTION);
+AST *AST_createFunction(ArenaAllocator *a, const Token *name, AST *body) {
+  AST *node = AST_createNode(a, AST_FUNCTION);
   node->data.function.name = *name;
   node->data.function.body = body;
   return node;
 }
 
-AST *AST_createReturn(AST *exp) {
-  AST *node = AST_createNode(AST_RETURN);
+AST *AST_createReturn(ArenaAllocator *a, AST *exp) {
+  AST *node = AST_createNode(a, AST_RETURN);
   node->data.ret.exp = exp;
   return node;
 }
 
-AST *AST_createExp(const char *data) {
-  AST *node = AST_createNode(AST_EXP);
+AST *AST_createExp(ArenaAllocator *a, const char *data) {
+  AST *node = AST_createNode(a, AST_EXP);
   node->data.exp.data = data;
   return node;
 }
@@ -94,31 +94,4 @@ void AST_print(const AST *ptr, int depth) {
     printf(")\n");
   } break;
   }
-}
-
-
-void AST_free(AST *ast) {
-  if (ast == NULL) return;
-
-  switch (ast->tag) {
-  case AST_PROGRAM: {
-    ASTList *curr = ast->data.program.functions;
-    while (curr != NULL) {
-      ASTList *next = curr->next;
-      AST_free(curr->node);
-      free(curr);
-      curr = next;
-    }
-  } break;
-  case AST_FUNCTION:
-    AST_free(ast->data.function.body);
-    break;
-  case AST_RETURN:
-    AST_free(ast->data.ret.exp);
-    break;
-  case AST_EXP:
-    break;
-  }
-
-  free(ast);
 }

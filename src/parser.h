@@ -15,6 +15,5 @@ typedef struct {
 
 Parser *Parser_init(ArenaAllocator *a, Token *tokens);
 AST *Parser_parse(Parser *parser);
-void Parser_free(Parser *parser);
 
 #endif
