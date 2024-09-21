@@ -109,10 +109,11 @@ static Token string(Lexer *lexer) {
 }
 
 static Token character(Lexer *lexer) {
-  // TODO(higanbana): only capture one character enclosed in '', otherwise return error token
-  while (peek(lexer) != '\'' && !is_at_end(lexer)) {
-    if (peek(lexer) == '\n') lexer->line++;
+  if (!is_at_end(lexer) && peek(lexer) != '\'') {
     advance(lexer);
+    if (peek(lexer) != '\'') {
+      return error_token(lexer, "Character literal contain only one codepoint.");
+    }
   }
 
   if (is_at_end(lexer)) return error_token(lexer, "Unterminated char.");
