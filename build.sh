@@ -9,7 +9,7 @@ OBJ_DIR="obj"
 BIN_DIR="bin"
 
 # Compilation flags
-COMMON_FLAGS="-std=c17 -Wall -Wextra -Wstrict-aliasing=3 -Wwrite-strings -Wvla -Wstrict-prototypes -Wstringop-overflow=4 -Wno-logical-op-parenthesis"
+COMMON_FLAGS="-std=c17 -Wall -Wextra -Wwrite-strings -Wvla -Wstrict-prototypes"
 DEBUG_FLAGS="$COMMON_FLAGS -ggdb -O0"
 RELEASE_FLAGS="$COMMON_FLAGS -O2 -DNDEBUG"
 
