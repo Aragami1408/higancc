@@ -9,6 +9,7 @@
 #include "ast.h"
 #include "asm_tree.h"
 #include "memory.h"
+#include "codegen.h"
 
 #include "stb_ds.h"
 
@@ -117,12 +118,7 @@ int main(int argc, char *argv[]) {
     printf("\n");
   }
 
-  // TODO(higanbana): implement proper codegen 
-  ASMNode* function = ASMNode_createFunction(&allocator, "main");
-  ASMNode* mov_inst = ASMNode_createMov(&allocator, ASMNode_createImm(&allocator, 42), ASMNode_createRegister(&allocator, REG_EAX));
-  ASMNode_addInstruction(&allocator, function, mov_inst);
-  ASMNode_addInstruction(&allocator, function, ASMNode_createRet(&allocator));
-  ASMNode* program = ASMNode_createProgram(&allocator, function);
+  ASMNode *program = convert_ast_to_asm(&allocator, global_ast);
 
   if (do_codegen) {
     printf("[CODEGEN ONLY]\n");
