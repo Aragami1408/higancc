@@ -233,10 +233,11 @@ Token Lexer_scanToken(Lexer *lexer) {
     case ';': return make_token(lexer, TOKEN_SEMICOLON);
     case ',': return make_token(lexer, TOKEN_COMMA);
     case '.': return make_token(lexer, TOKEN_DOT);
-    case '-': return make_token(lexer, TOKEN_MINUS);
-    case '+': return make_token(lexer, TOKEN_PLUS);
+    case '-': return make_token(lexer, match(lexer, '-') ? TOKEN_MINUS_MINUS : TOKEN_MINUS);
+    case '+': return make_token(lexer, match(lexer, '+') ? TOKEN_PLUS_PLUS : TOKEN_PLUS);
     case '/': return make_token(lexer, TOKEN_SLASH);
     case '*': return make_token(lexer, TOKEN_STAR);
+    case '~': return make_token(lexer, TOKEN_TILDE);
     case '!':
               return make_token(lexer, match(lexer, '=') ? TOKEN_BANG_EQUAL : TOKEN_BANG);
     case '=':
