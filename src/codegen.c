@@ -59,8 +59,13 @@ void generate_asm_code(FILE *out_file, ASMNode *node) {
     generate_asm_code(out_file, node->data.program.function);
     break;
   case ASM_FUNCTION: {
+#ifdef HIGANCC_PLATFORM_WINDOWS
     fprintf(out_file,"  .globl %s\n", node->data.function.name);
     fprintf(out_file,"%s:\n", node->data.function.name);
+#else
+    fprintf(out_file,"  .globl _%s\n", node->data.function.name);
+    fprintf(out_file,"_%s:\n", node->data.function.name);
+#endif
     ASMInstList *curr = node->data.function.instructions;
     while (curr != NULL) {
       generate_asm_code(out_file, curr->instruction);
