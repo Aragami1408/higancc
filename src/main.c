@@ -35,7 +35,9 @@ void print_tokens(Token *tokens, usize len) {
 
 int main(int argc, char *argv[]) {
   char *input_file = NULL;
-  const char *output_file = "a.out";
+  
+  // Default values for command line arguments
+  const char *output_file = "out.S";
   bool do_lex = false;
   bool do_parse = false;
   bool do_codegen = false;
@@ -120,22 +122,25 @@ int main(int argc, char *argv[]) {
 
   ASMNode *program = convert_ast_to_asm(&allocator, global_ast);
 
-  if (do_codegen) {
-    printf("[CODEGEN ONLY]\n");
-    print_asm_tree(program, 0);
-    printf("\n");
-  }
-
   FILE *out_file = fopen(output_file, "w");
   if (out_file == NULL) {
     perror("Error opening output file");
     arrfree(tokens);  
     ArenaAllocator_freeAll(&allocator);
+    fclose(out_file);
     return 1;
   }
 
+  if (do_codegen) {
+    printf("[CODEGEN ONLY]\n");
+    print_asm_tree(program, 0);
+    generate_asm_code(out_file, program);
+    printf("\n");
+  }
+ 
   arrfree(tokens);  
   ArenaAllocator_freeAll(&allocator);
+  fclose(out_file);
 
   return 0; 
 }

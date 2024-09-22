@@ -54,7 +54,8 @@ void *ArenaAllocator_alloc(ArenaAllocator *a, usize size) {
 }
 
 void ArenaAllocator_free(ArenaAllocator *a, void *ptr) {
-
+  (void)a;
+  (void)ptr;
 }
 
 void *ArenaAllocator_resizeAlign(ArenaAllocator *a, void *old_memory, usize old_size, usize new_size, size_t align) {
