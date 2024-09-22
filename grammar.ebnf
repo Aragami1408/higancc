@@ -1,6 +1,6 @@
 program -> function
 function -> "int" identifier "(" "void" ")" "{" statement "}"
 statement -> "return" <exp> ";"
-exp -> int
+exp -> int | unop exp | "(" exp ")"
 identifier -> ? An identifier token ?
 int -> ? A constant token ?
