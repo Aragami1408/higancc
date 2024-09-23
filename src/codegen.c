@@ -42,10 +42,6 @@ ASMNode *convert_ast_to_asm(ArenaAllocator *a, const AST *ptr) {
 
     return dummy_func;
   }
-  case AST_EXP: {
-    ASMNode *imm = ASMNode_createImm(a, atoi(ast.data.exp.data));
-    return imm;
-  }
   default:
     fprintf(stderr, "Unsupported AST node type\n");
     return NULL;

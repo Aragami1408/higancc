@@ -46,9 +46,16 @@ AST *AST_createReturn(ArenaAllocator *a, AST *exp) {
   return node;
 }
 
-AST *AST_createExp(ArenaAllocator *a, const char *data) {
-  AST *node = AST_createNode(a, AST_EXP);
-  node->data.exp.data = data;
+AST *AST_createUnary(ArenaAllocator *a, ASTOperator op, AST *exp) {
+  AST *node = AST_createNode(a, AST_UNARY);
+  node->data.unary.op = op;
+  node->data.unary.exp = exp;
+  return node;
+}
+
+AST *AST_createConstant(ArenaAllocator *a, int data) {
+  AST *node = AST_createNode(a, AST_CONSTANT);
+  node->data.constant.data = data;
   return node;
 }
 
@@ -88,10 +95,25 @@ void AST_print(const AST *ptr, int depth) {
     TAB
     printf(")\n");
   } break;
-  case AST_EXP: {
-    struct AST_EXP exp = ast.data.exp;
-    printf("Constant(%s", exp.data);
+  case AST_UNARY: {
+    struct AST_UNARY unary = ast.data.unary;
+    printf("Unary(operator=");
+    switch (unary.op) {
+    case AST_UNARY_COMPLEMENT:
+      printf("Complement");
+      break;
+    case AST_UNARY_NEGATE:
+      printf("Negate");
+      break;
+    }
+    printf(",exp=\n");
+    AST_print(unary.exp, depth+1);
+    TAB
     printf(")\n");
+  } break;
+  case AST_CONSTANT: {
+    struct AST_CONSTANT constant = ast.data.constant;
+    printf("Constant(%d)\n", constant.data);
   } break;
   }
 }

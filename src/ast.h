@@ -8,8 +8,14 @@ typedef enum {
   AST_PROGRAM,
   AST_FUNCTION,
   AST_RETURN,
-  AST_EXP,
+  AST_CONSTANT,
+  AST_UNARY,
 } ASTNodeType;
+
+typedef enum {
+  AST_UNARY_COMPLEMENT,
+  AST_UNARY_NEGATE
+} ASTOperator;
 
 typedef struct ASTList ASTList;
 typedef struct AST AST;
@@ -37,9 +43,14 @@ struct AST {
       AST *exp;  
     } ret;
 
-    struct AST_EXP{
-      const char *data;
-    } exp;
+    struct AST_UNARY {
+      ASTOperator op;
+      AST *exp;
+    } unary;
+
+    struct AST_CONSTANT {
+      int data;
+    } constant;
   } data;
 };
 
@@ -48,7 +59,8 @@ AST *AST_createProgram(ArenaAllocator *a);
 void AST_addFunctionToProgram(ArenaAllocator *a, AST *program, AST *function);
 AST *AST_createFunction(ArenaAllocator *a, const Token *name, AST *body);
 AST *AST_createReturn(ArenaAllocator *a, AST *exp);
-AST *AST_createExp(ArenaAllocator *a, const char *data);
+AST *AST_createUnary(ArenaAllocator *a, ASTOperator op, AST *exp);
+AST *AST_createConstant(ArenaAllocator *a, int data);
 
 void AST_print(const AST *ptr, int depth);
 
