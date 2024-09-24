@@ -30,7 +30,6 @@ struct ArenaAllocator {
 void ArenaAllocator_init(ArenaAllocator *a, void *backing_buffer, usize backing_buffer_length);
 void *ArenaAllocator_allocAlign(ArenaAllocator *a, usize size, usize align);
 void *ArenaAllocator_alloc(ArenaAllocator *a, usize size);
-void ArenaAllocator_free(ArenaAllocator *a, void *ptr);
 void *ArenaAllocator_resizeAlign(ArenaAllocator *a, void *old_memory, usize old_size, usize new_size, size_t align);
 void *ArenaAllocator_resize(ArenaAllocator *a, void *old_memory, usize old_size, usize new_size);
 void ArenaAllocator_freeAll(ArenaAllocator *a);
