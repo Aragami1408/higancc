@@ -10,8 +10,7 @@
 #include "asm_tree.h"
 #include "memory.h"
 #include "codegen.h"
-
-#include "stb_ds.h"
+#include "arraylist.h"
 
 void print_usage(const char* program_name) {
   printf("Usage: %s [options] <input_file>\n", program_name);
@@ -23,9 +22,9 @@ void print_usage(const char* program_name) {
   printf("  -h, --help              Display this help message\n");
 }
 
-void print_tokens(Token *tokens, usize len) {
+void print_tokens(ArrayList(Token) *tokens, usize len) {
   for (usize i = 0; i < len; i++) {
-    Token token = tokens[i];
+    Token token = ArrayList_get(Token, tokens, i);
     print_token(&token);
     if (token.type == TOKEN_ERROR || token.type == TOKEN_EOF) {
       break;
@@ -83,16 +82,15 @@ int main(int argc, char *argv[]) {
 
   Lexer *lexer = Lexer_init(&allocator, source);
   usize token_list_size = 0;
-  Token *tokens = Lexer_scanTokens(lexer, &token_list_size);
+  ArrayList(Token) *tokens = Lexer_scanTokens(lexer, &token_list_size);
   if (tokens == NULL) {
     fprintf(stderr, "Lexical analysis failed\n");
-    arrfree(tokens);  
     ArenaAllocator_freeAll(&allocator);
     return 1;
   }
 
   for (usize i = 0; i < token_list_size; i++) {
-    Token token = tokens[i];
+    Token token = ArrayList_get(Token, tokens, i);
     if (token.type == TOKEN_ERROR) {
       fprintf(stderr, "[LEXER ERROR - line %d] %.*s\n", token.line, token.length, token.start);
       return 1;
@@ -109,7 +107,6 @@ int main(int argc, char *argv[]) {
   AST *global_ast = Parser_parse(parser);
   if (global_ast == NULL) {
     fprintf(stderr, "Parsing failed\n"); 
-    arrfree(tokens);  
     ArenaAllocator_freeAll(&allocator);
     return 1;
   }
@@ -125,7 +122,6 @@ int main(int argc, char *argv[]) {
   FILE *out_file = fopen(output_file, "w");
   if (out_file == NULL) {
     perror("Error opening output file");
-    arrfree(tokens);  
     ArenaAllocator_freeAll(&allocator);
     fclose(out_file);
     return 1;
@@ -138,7 +134,6 @@ int main(int argc, char *argv[]) {
     printf("\n");
   }
  
-  arrfree(tokens);  
   ArenaAllocator_freeAll(&allocator);
   fclose(out_file);
 

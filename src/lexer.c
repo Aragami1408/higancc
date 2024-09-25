@@ -6,8 +6,6 @@
 
 #include "lexer.h"
 
-#define STB_DS_IMPLEMENTATION
-#include "stb_ds.h"
 
 static bool is_at_end(const Lexer *lexer) {
   return *lexer->current == '\0';
@@ -201,16 +199,17 @@ Lexer *Lexer_init(ArenaAllocator *a, const char *source) {
   return lexer;
 }
 
-Token *Lexer_scanTokens(Lexer *lexer, usize *len) {
-  Token *tokens = NULL;
+ArrayList(Token) *Lexer_scanTokens(Lexer *lexer, usize *len) {
+  ArrayList(Token) *tokens = ArrayList_init(Token, lexer->allocator);
 
   Token token;
   do {
     token = Lexer_scanToken(lexer);
-    arrput(tokens, token);
+    ArrayList_add(Token, tokens, token);
+    //arrput(tokens, token);
   } while (token.type != TOKEN_EOF);
 
-  *len = arrlenu(tokens);
+  *len = ArrayList_size(Token, tokens);
 
   return tokens;
 }

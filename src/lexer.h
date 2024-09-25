@@ -13,7 +13,7 @@ typedef struct {
 } Lexer;
 
 Lexer *Lexer_init(ArenaAllocator *a, const char *source);
-Token *Lexer_scanTokens(Lexer *lexer, usize *len);
+ArrayList(Token) *Lexer_scanTokens(Lexer *lexer, usize *len);
 Token Lexer_scanToken(Lexer *lexer);
 
 #endif

@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "arraylist.h"
+
 #define LIST_OF_TOKEN_TYPES \
   X(TOKEN_LEFT_PAREN) \
   X(TOKEN_RIGHT_PAREN) \
@@ -61,4 +63,6 @@ typedef struct {
 } Token;
 
 void print_token(const Token *token);
+
+ARRAYLIST_PROTOTYPE(Token)
 #endif

@@ -4,17 +4,15 @@
 #include "ast.h"
 #include "utils.h"
 
-#include "stb_ds.h"
-
 // HELPER FUNCTIONS
 // ----------------
 
 static Token peek(const Parser *parser) {
-  return parser->tokens[parser->current];
+  return parser->tokens->data[parser->current];
 }
 
 static Token previous(const Parser *parser) {
-  return parser->tokens[parser->current - 1];
+  return parser->tokens->data[parser->current - 1];
 }
 
 static bool is_at_end(const Parser *parser) {
@@ -83,36 +81,18 @@ AST *parse_function(Parser *parser) {
   if (!check(parser, TOKEN_IDENTIFIER)) {
     error(parser, "Expect identifier after data-type");
   }
-
   Token function_name = peek(parser);
   advance(parser);
 
-  if (!check(parser, TOKEN_LEFT_PAREN)) {
-    error(parser, "Expect '(' after function name");
-  }
-  advance(parser);
-
-  if (!check(parser, TOKEN_KW_VOID)) {
-    error(parser, "Expect 'void' after '('");
-  }
-  advance(parser);
-
-  if (!check(parser, TOKEN_RIGHT_PAREN)) {
-    error(parser, "Expect ')' after 'void'");
-  }
-  advance(parser);
-
-  if (!check(parser, TOKEN_LEFT_BRACE)) {
-    error(parser, "Expect '{' after ')'");
-  }
-  advance(parser);
+  consume(parser, TOKEN_LEFT_PAREN, "Expect '(' after function name");
+  consume(parser, TOKEN_KW_VOID, "Expect 'void' after '('");
+  consume(parser, TOKEN_RIGHT_PAREN, "Expect ')' after void");
+  consume(parser, TOKEN_LEFT_BRACE, "Expect '{' after ')'");
 
   AST *statement = parse_statement(parser);
 
-  if (!check(parser, TOKEN_RIGHT_BRACE)) {
-    error(parser, "Expect '}' after statement");
-  }
-  advance(parser);
+  consume(parser, TOKEN_RIGHT_BRACE, "Expect '}' after statement");
+
   return AST_createFunction(parser->allocator, &function_name, statement);
 }
 
@@ -174,7 +154,7 @@ AST *parse_exp(Parser *parser) {
 
 // PUBLIC METHODS
 // --------------
-Parser *Parser_init(ArenaAllocator *a, Token *tokens) {
+Parser *Parser_init(ArenaAllocator *a, ArrayList(Token) *tokens) {
   Parser *parser = (Parser *)ArenaAllocator_alloc(a, sizeof(Parser));
   parser->tokens = tokens;
   parser->current = 0;

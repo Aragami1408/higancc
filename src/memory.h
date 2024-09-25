@@ -1,6 +1,8 @@
 #ifndef HIGANCC_MEMORY_H
 #define HIGANCC_MEMORY_H
 
+// IN COURTESY OF GINGER BILL
+
 #include <stddef.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -14,7 +16,7 @@
  */
 
 
-#ifndef DEFAULT_ALIGNMENT 
+#ifndef DEFAULT_ALIGNMENT
 #define DEFAULT_ALIGNMENT (2 * sizeof(void *))
 #endif
 

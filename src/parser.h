@@ -5,15 +5,16 @@
 #include "common.h"
 #include "ast.h"
 #include "memory.h"
+#include "arraylist.h"
 
 
 typedef struct {
-  Token *tokens;
+  ArrayList(Token) *tokens;
   usize current;
   ArenaAllocator *allocator;
 } Parser;
 
-Parser *Parser_init(ArenaAllocator *a, Token *tokens);
+Parser *Parser_init(ArenaAllocator *a, ArrayList(Token) *tokens);
 AST *Parser_parse(Parser *parser);
 
 #endif
