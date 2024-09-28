@@ -6,15 +6,15 @@
 #include "ast.h"
 #include "arraylist.h"
 
-typedef struct Program TackyProgram;
-typedef struct Function TackyFunction;
-typedef struct Instruction TackyInstruction;
-typedef struct Val TackyVal;
+typedef struct TackyProgram TackyProgram;
+typedef struct TackyFunction TackyFunction;
+typedef struct TackyInstruction TackyInstruction;
+typedef struct TackyVal TackyVal;
 typedef struct Tacky Tacky;
 
-ARRAYLIST_PROTOTYPE(TackyProgram);
-ARRAYLIST_PROTOTYPE(TackyFunction);
-ARRAYLIST_PROTOTYPE(TackyInstruction);
+ARRAYLIST_PROTOTYPE(TackyProgram)
+ARRAYLIST_PROTOTYPE(TackyFunction)
+ARRAYLIST_PROTOTYPE(TackyInstruction)
 
 typedef enum {
 	TACKY_VAL_CONSTANT,
@@ -31,24 +31,24 @@ typedef enum {
 	TACKY_OPERATOR_UNARY_NEGATE
 } TackyOperator;
 
-struct Val {
+struct TackyVal {
 	TackyValType type;
 	union {
 		int constant;
 		const char *identifier;
-	} data;
+	};
 };
 
-struct Program {
+struct TackyProgram {
 	ArrayList(TackyFunction) *functions;
 };
 
-struct Function {
+struct TackyFunction {
 	const char *name;
 	ArrayList(TackyInstruction) *body;
 };
 
-struct Instruction {
+struct TackyInstruction {
 	TackyInstructionType type;
 	union {
 		TackyVal return_val;
@@ -57,7 +57,7 @@ struct Instruction {
 			TackyVal src;
 			TackyVal dst;
 		} unary;
-	} data;
+	};
 };
 
 struct Tacky {
@@ -67,6 +67,6 @@ struct Tacky {
 };
 
 Tacky *Tacky_create(ArenaAllocator *allocator);
-TackyProgram *emit_tacky(Tacky *tacky, AST *program);
+TackyProgram *emit_tacky(Tacky *tacky, ASTProgram *program);
 
 #endif
