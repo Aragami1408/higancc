@@ -113,3 +113,28 @@ char* format_string(const char* format, ...) {
 
 	return formatted_str;
 }
+
+#ifndef HIGANCC_PLATFORM_POSIX
+char *strdup(const char *s) {
+	usize size = strlen(s) + 1;
+	char *p = malloc(size);
+	if (p != NULL) {
+		memcpy(p, s, size);
+	}
+	return p;
+}
+
+char *strndup(const char *s, usize n) {
+	char *p;
+	usize n1;
+
+	for (n1 = 0; n1 < n && s[n1] != '\0'; n1++)
+		continue;
+	p = malloc(n + 1);
+	if (p != NULL) {
+		memcpy(p, s, n1);
+		p[n1] = '\0';
+	}
+	return p;
+}
+#endif
