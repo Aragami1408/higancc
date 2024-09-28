@@ -6,11 +6,9 @@
 #include "utils.h"
 #include "lexer.h"
 #include "parser.h"
-#include "ast.h"
-#include "asm_tree.h"
 #include "memory.h"
-#include "codegen.h"
 #include "arraylist.h"
+#include "pretty_print.h"
 #include "tacky.h"
 
 void print_usage(const char* program_name) {
@@ -105,19 +103,18 @@ int main(int argc, char *argv[]) {
 	}
 
 	Parser *parser = Parser_init(&allocator, tokens);
-	AST *global_ast = Parser_parse(parser);
-	if (global_ast == NULL) {
-		fprintf(stderr, "Parsing failed\n"); 
+	ASTProgram *program_ast = Parser_parse(parser);
+	if (program_ast == NULL) {
+		fprintf(stderr, "Parsing failed\n");
 		ArenaAllocator_freeAll(&allocator);
 		return 1;
 	}
 
 	if (do_parse) {
 		printf("[PARSING ONLY]\n");
-		AST_print(global_ast, 0);
+		pretty_print_ast(program_ast);
 		printf("\n");
 	}
-
 
 	FILE *out_file = fopen(output_file, "w");
 	if (out_file == NULL) {
@@ -126,8 +123,6 @@ int main(int argc, char *argv[]) {
 		fclose(out_file);
 		return 1;
 	}
-
-	Tacky *tacky = Tacky_create(&allocator);
 
 	ArenaAllocator_freeAll(&allocator);
 	fclose(out_file);

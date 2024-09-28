@@ -15,6 +15,6 @@ typedef struct {
 } Parser;
 
 Parser *Parser_init(ArenaAllocator *a, ArrayList(Token) *tokens);
-AST *Parser_parse(Parser *parser);
+ASTProgram *Parser_parse(Parser *parser);
 
 #endif

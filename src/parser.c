@@ -66,50 +66,54 @@ static void consume(Parser *parser, TokenType type, const char *message) {
 // RECURSIVE DESCENT PARSING
 // -------------------------
 
-AST *parse_function(Parser *parser);
-AST *parse_statement(Parser *parser);
-AST *parse_exp(Parser *parser);
+ASTProgram *parse_program(Parser *parser);
+ASTFunction *parse_function(Parser *parser);
+ASTStatement *parse_statement(Parser *parser);
+ASTExpression *parse_exp(Parser *parser);
 ASTOperator parse_unop(Parser *parser);
 
 
-AST *parse_function(Parser *parser) {
+ASTFunction *parse_function(Parser *parser) {
+
 	if (!(check(parser, TOKEN_KW_INT) || check(parser, TOKEN_KW_FLOAT))) {
 		error(parser, "Expect 'int' or 'float' before function name.");
 	}
 	advance(parser);
 
 	if (!check(parser, TOKEN_IDENTIFIER)) {
-		error(parser, "Expect identifier after data-type");
+		error(parser, "Expect identifier after return type");
 	}
-	Token function_name = peek(parser);
+	const char *name = strndup(peek(parser).start, peek(parser).length);	
 	advance(parser);
+
+	ASTFunction *function = AST_createFunction(name, parser->allocator);
 
 	consume(parser, TOKEN_LEFT_PAREN, "Expect '(' after function name");
 	consume(parser, TOKEN_KW_VOID, "Expect 'void' after '('");
 	consume(parser, TOKEN_RIGHT_PAREN, "Expect ')' after void");
 	consume(parser, TOKEN_LEFT_BRACE, "Expect '{' after ')'");
 
-	AST *statement = parse_statement(parser);
+	while (!check(parser, TOKEN_RIGHT_BRACE)) {
+		ASTStatement *statement = parse_statement(parser);
+		ArrayList_add(ASTStatement, function->statements, *statement);		
+	}
 
-	consume(parser, TOKEN_RIGHT_BRACE, "Expect '}' after statement");
-
-	return AST_createFunction(parser->allocator, &function_name, statement);
+	advance(parser);
+	
+	return function;
 }
 
-AST *parse_statement(Parser *parser) {
-	if (!check(parser, TOKEN_KW_RETURN)) {
-		error(parser, "Expect 'return' before expression.");
-	}
+ASTStatement *parse_statement(Parser *parser) {
+	consume(parser, TOKEN_KW_RETURN, "Expect 'return' before expression.");
+
+	ASTExpression *return_expr = parse_exp(parser);
 	advance(parser);
 
-	AST *return_val = parse_exp(parser);
-	advance(parser);
+	consume(parser, TOKEN_SEMICOLON, "Expect ';' after expression.");
 
-	if (!check(parser, TOKEN_SEMICOLON)) {
-		error(parser, "Expect ';' after expression.");
-	}
-	advance(parser);
-	return AST_createReturn(parser->allocator, return_val);
+	ASTStatement *statement = (ASTStatement *)ArenaAllocator_alloc(parser->allocator, sizeof(ASTStatement));
+	statement->return_expr = return_expr;
+	return statement;
 }
 
 ASTOperator parse_unop(Parser *parser) {
@@ -121,25 +125,30 @@ ASTOperator parse_unop(Parser *parser) {
 		return -1;
 }
 
-AST *parse_exp(Parser *parser) {
+ASTExpression *parse_exp(Parser *parser) {
+	ASTExpression *expr = (ASTExpression *)ArenaAllocator_alloc(parser->allocator, sizeof(ASTExpression));
 	if (check(parser, TOKEN_INT) || check(parser, TOKEN_FLOAT)) {
 		int value = atoi(substring(parser->allocator, peek(parser).start, 0, peek(parser).length)); 
-		return AST_createConstant(parser->allocator, value);
+		expr->type = AST_EXPRESSION_CONSTANT;
+		expr->constant = value;
 		// return AST_createExp(parser->allocator, substring(parser->allocator, peek(parser).start, 0, peek(parser).length));
 	}
 	else if (check(parser, TOKEN_CHAR)) {
 		char c = peek(parser).start[1];
-		return AST_createConstant(parser->allocator, (int)c);
+		expr->type = AST_EXPRESSION_CONSTANT;
+		expr->constant = (int)c;
 	}
 	else if (check(parser, TOKEN_TILDE) || check(parser, TOKEN_MINUS)) {
 		ASTOperator operator = parse_unop(parser);
 		advance(parser);
-		AST *inner_exp = parse_exp(parser);
-		return AST_createUnary(parser->allocator, operator, inner_exp);
+		ASTExpression *inner_exp = parse_exp(parser);
+		expr->type = AST_EXPRESSION_UNARY;
+		expr->unary.op= operator;
+		expr->unary.val = inner_exp;
 	}
 	else if (check(parser, TOKEN_LEFT_PAREN)) {
 		advance(parser);
-		AST *inner_exp = parse_exp(parser);
+		ASTExpression *inner_exp = parse_exp(parser);
 		advance(parser);
 		if (!check(parser, TOKEN_RIGHT_PAREN)) {
 			error(parser, "Expect ')' after grouping expression");
@@ -148,8 +157,9 @@ AST *parse_exp(Parser *parser) {
 	}
 	else {
 		error(parser, "Malformed expression");
+		return NULL;
 	}
-	return NULL;
+	return expr;
 }
 
 // PUBLIC METHODS
@@ -162,14 +172,15 @@ Parser *Parser_init(ArenaAllocator *a, ArrayList(Token) *tokens) {
 	return parser;
 }
 
-AST *Parser_parse(Parser *parser) {
-	AST *program = AST_createProgram(parser->allocator);
+ASTProgram *Parser_parse(Parser *parser) {
+	ASTProgram *program = AST_createProgram(parser->allocator);
 
-	AST *function = NULL;
+	ASTFunction *function = NULL;
 
 	while (!is_at_end(parser)) {
 		function = parse_function(parser);
-		AST_addFunctionToProgram(parser->allocator, program, function);
+		ArrayList_add(ASTFunction, program->functions, *function);
+		//AST_addFunctionToProgram(parser->allocator, program, function);
 	}
 
 	return program;
