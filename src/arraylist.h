@@ -7,8 +7,9 @@
 #define ARRAYLIST_DEFAULT_CAPACITY 8
 
 #define ArrayList(Type) ArrayList_##Type
-#define ArrayList_init(Type, Allocator) ArrayList_##Type##_init(Allocator);
+#define ArrayList_init(Type, Allocator) ArrayList_##Type##_init(Allocator)
 #define ArrayList_size(Type, Array) ArrayList_##Type##_size(Array)
+#define ArrayList_capacity(Type, Array) ArrayList_##Type##_capacity(Array)
 #define ArrayList_isEmpty(Type, Array) ArrayList_##Type##_isEmpty(Array)
 #define ArrayList_get(Type, Array, Index) ArrayList_##Type##_get(Array, Index)
 #define ArrayList_set(Type, Array, Index, Elem) ArrayList_##Type##_set(Array, Index, Elem)
@@ -19,18 +20,19 @@
 #define ARRAYLIST_PROTOTYPE(Type) \
 typedef struct {\
 	Type *data; \
-	size_t len; \
-	size_t capacity;\
+	usize len; \
+	usize capacity;\
     ArenaAllocator *allocator;\
 } ArrayList_##Type;\
 ArrayList_##Type* ArrayList_##Type##_init(ArenaAllocator *a);\
-int ArrayList_##Type##_size(ArrayList_##Type *arr);\
+usize ArrayList_##Type##_size(ArrayList_##Type *arr);\
+usize ArrayList_##Type##_capacity(ArrayList_##Type *arr);\
 bool ArrayList_##Type##_isEmpty(ArrayList_##Type *arr);\
-Type ArrayList_##Type##_get(ArrayList_##Type *arr, size_t index);\
-void ArrayList_##Type##_set(ArrayList_##Type *arr, size_t index, Type elem);\
+Type ArrayList_##Type##_get(ArrayList_##Type *arr, usize index);\
+void ArrayList_##Type##_set(ArrayList_##Type *arr, usize index, Type elem);\
 void ArrayList_##Type##_add(ArrayList_##Type *arr, Type elem);\
-void ArrayList_##Type##_addAt(ArrayList_##Type *arr, int index, Type elem);\
-Type ArrayList_##Type##_remove(ArrayList_##Type *arr, size_t index);\
+void ArrayList_##Type##_addAt(ArrayList_##Type *arr, usize index, Type elem);\
+Type ArrayList_##Type##_remove(ArrayList_##Type *arr, usize index);\
 
 #define ARRAYLIST_IMPL(Type) \
 ArrayList_##Type* ArrayList_##Type##_init(ArenaAllocator *a) {\
@@ -41,28 +43,31 @@ ArrayList_##Type* ArrayList_##Type##_init(ArenaAllocator *a) {\
     array_list->allocator = a;\
 	return array_list;\
 }\
-int ArrayList_##Type##_size(ArrayList_##Type *arr) {\
+usize ArrayList_##Type##_size(ArrayList_##Type *arr) {\
 	return arr->len;\
+}\
+usize ArrayList_##Type##_capacity(ArrayList_##Type *arr){\
+	return arr->capacity;\
 }\
 bool ArrayList_##Type##_isEmpty(ArrayList_##Type *arr) {\
 	return arr->len == 0;\
 }\
-Type ArrayList_##Type##_get(ArrayList_##Type *arr, size_t index) {\
+Type ArrayList_##Type##_get(ArrayList_##Type *arr, usize index) {\
 	return arr->data[index];\
 }\
-void ArrayList_##Type##_set(ArrayList_##Type *arr, size_t index, Type elem) {\
+void ArrayList_##Type##_set(ArrayList_##Type *arr, usize index, Type elem) {\
 	arr->data[index] = elem;\
 }\
 void ArrayList_##Type##_add(ArrayList_##Type *arr, Type item) {\
 	if (arr->len + 1 >= arr->capacity) {\
-        int prev_capacity = arr->capacity;\
+        usize prev_capacity = arr->capacity;\
 		if (arr->capacity == 0) arr->capacity = 1;\
 		else arr->capacity *= 2;\
 		arr->data = (Type*)ArenaAllocator_resize(arr->allocator, arr->data, prev_capacity, sizeof(Type) * arr->capacity);\
 	}\
 	arr->data[arr->len++]=item;\
 }\
-void ArrayList_##Type##_addAt(ArrayList_##Type *arr, int index, Type elem) {\
+void ArrayList_##Type##_addAt(ArrayList_##Type *arr, usize index, Type elem) {\
 	if (arr->len + 1 >= arr->capacity) {\
 		void *prev = arr->data;\
 		arr->data = ArenaAllocator_alloc(arr->allocator, arr->capacity * 2 * sizeof(Type));\
@@ -73,7 +78,7 @@ void ArrayList_##Type##_addAt(ArrayList_##Type *arr, int index, Type elem) {\
 	arr->data[index] = elem;\
 	arr->len++;\
 }\
-Type ArrayList_##Type##_remove(ArrayList_##Type *arr, size_t index) {\
+Type ArrayList_##Type##_remove(ArrayList_##Type *arr, usize index) {\
 	if (index >= arr->len) return (Type){0};\
 	Type value = arr->data[index];\
 	if (index == arr->len - 1) {\
