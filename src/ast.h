@@ -3,27 +3,7 @@
 
 #include "token.h"
 #include "memory.h"
-
-typedef enum {
-	AST_PROGRAM,
-	AST_FUNCTION,
-	AST_RETURN,
-	AST_CONSTANT,
-	AST_UNARY,
-} ASTNodeType;
-
-typedef enum {
-	AST_UNARY_COMPLEMENT,
-	AST_UNARY_NEGATE
-} ASTOperator;
-
-typedef struct ASTList ASTList;
-typedef struct AST AST;
-
-struct ASTList {
-	AST *node;
-	ASTList *next;
-};
+#include "arraylist.h"
 
 /*
 struct Program:
@@ -33,54 +13,70 @@ struct Function:
 	Token name;
 	ArrayList<Statement> statements;
 
-struct Statement:
+struct Statement(tagged union):
 	Return(Expression expr)
 
-enum ExpressionType:
-	Constant,
-	Unary
-
-struct Expression(ExpressionType):
+struct Expression(tagged union):
 	Constant(int)
 	Unary(Operators unary_op, Expression expr)
 */
-struct AST {
 
-	ASTNodeType tag;
+typedef struct ASTProgram ASTProgram;
+typedef struct ASTFunction ASTFunction;
+typedef struct ASTStatement ASTStatement;
+typedef struct ASTExpression ASTExpression;
 
-	union {
-		struct AST_PROGRAM {
-			ASTList *functions;
-		} program;
+ARRAYLIST_PROTOTYPE(ASTFunction)
+ARRAYLIST_PROTOTYPE(ASTStatement)
+ARRAYLIST_PROTOTYPE(ASTExpression)
 
-		struct AST_FUNCTION {
-			Token name;
-			AST *body;
-		} function;
+typedef enum {
+	AST_STATEMENT_RETURN,
+} ASTStatementType;
 
-		struct AST_RETURN {
-			AST *exp;
-		} ret;
+typedef enum {
+	AST_EXPRESSION_CONSTANT,
+	AST_EXPRESSION_UNARY,
+} ASTExpressionType;
 
-		struct AST_UNARY {
-			ASTOperator op;
-			AST *exp;
-		} unary;
+typedef enum {
+	AST_UNARY_COMPLEMENT,
+	AST_UNARY_NEGATE
+} ASTOperator;
 
-		struct AST_CONSTANT {
-			int data;
-		} constant;
-	} data;
+
+
+struct ASTProgram {
+	ArrayList(ASTFunction) *functions;
+	ArenaAllocator *allocator;
 };
 
-AST *AST_createNode(ArenaAllocator *a, ASTNodeType type);
-AST *AST_createProgram(ArenaAllocator *a);
-void AST_addFunctionToProgram(ArenaAllocator *a, AST *program, AST *function);
-AST *AST_createFunction(ArenaAllocator *a, const Token *name, AST *body);
-AST *AST_createReturn(ArenaAllocator *a, AST *exp);
-AST *AST_createUnary(ArenaAllocator *a, ASTOperator op, AST *exp);
-AST *AST_createConstant(ArenaAllocator *a, int data);
+struct ASTFunction {
+	const char *name;
+	ArrayList(ASTStatement) *statements;
+	ArenaAllocator *allocator;
+};
 
-void AST_print(const AST *ptr, int depth);
+struct ASTStatement {
+	ASTStatementType type;
+	union {
+		ASTExpression *return_expr;
+	};
+};
+
+struct ASTExpression {
+	ASTExpressionType type;
+	union {
+		int constant;
+		struct {
+			ASTOperator op;
+			ASTExpression *val;
+		} unary;
+	};
+};
+
+ASTProgram *AST_createProgram(ArenaAllocator *a);
+ASTFunction *AST_createFunction(const char *name, ArenaAllocator *a);
+ASTExpression *AST_createExpression(ASTExpressionType type, ArenaAllocator *a);
 
 #endif
