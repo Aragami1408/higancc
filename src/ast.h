@@ -5,22 +5,6 @@
 #include "memory.h"
 #include "arraylist.h"
 
-/*
-struct Program:
-	ArrayList<Function> functions;
-
-struct Function:
-	Token name;
-	ArrayList<Statement> statements;
-
-struct Statement(tagged union):
-	Return(Expression expr)
-
-struct Expression(tagged union):
-	Constant(int)
-	Unary(Operators unary_op, Expression expr)
-*/
-
 typedef struct ASTProgram ASTProgram;
 typedef struct ASTFunction ASTFunction;
 typedef struct ASTStatement ASTStatement;
@@ -43,8 +27,6 @@ typedef enum {
 	AST_UNARY_COMPLEMENT,
 	AST_UNARY_NEGATE
 } ASTOperator;
-
-
 
 struct ASTProgram {
 	ArrayList(ASTFunction) *functions;
