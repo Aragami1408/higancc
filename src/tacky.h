@@ -22,8 +22,8 @@ typedef enum {
 } TackyValType;
 
 typedef enum {
-	TACKY_INST_RETURN,
-	TACKY_INST_UNARY
+	TACKY_INSTRUCTION_RETURN,
+	TACKY_INSTRUCTION_UNARY
 } TackyInstructionType;
 
 typedef enum {
@@ -35,7 +35,7 @@ struct TackyVal {
 	TackyValType type;
 	union {
 		int constant;
-		const char *identifier;
+		const char *variable;
 	};
 };
 
@@ -67,6 +67,6 @@ struct Tacky {
 };
 
 Tacky *Tacky_create(ArenaAllocator *allocator);
-TackyProgram *emit_tacky(Tacky *tacky, ASTProgram *program);
+TackyProgram *emit_tacky(Tacky *tacky, const ASTProgram *program);
 
 #endif

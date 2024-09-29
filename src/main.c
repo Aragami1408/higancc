@@ -8,7 +8,7 @@
 #include "parser.h"
 #include "memory.h"
 #include "arraylist.h"
-#include "pretty_print.h"
+#include "dump.h"
 #include "tacky.h"
 
 void print_usage(const char* program_name) {
@@ -16,7 +16,8 @@ void print_usage(const char* program_name) {
 	printf("Options:\n");
 	printf("  -l, --lex               Perform lexical analysis and print tokens\n");
 	printf("  -p, --parse             Perform parsing and print AST\n");
-	printf("  -c, --codegen           Perform code generation and print assembly tree\n");
+	printf("  -c, --codegen           Perform code generation and print assembly code\n");
+	printf("  -t, --tacky             Perform IR conversion and print TACKY code\n");
 	printf("  -o, --output <file>     Specify output file (default: a.out)\n");
 	printf("  -h, --help              Display this help message\n");
 }
@@ -39,22 +40,25 @@ int main(int argc, char *argv[]) {
 	bool do_lex = false;
 	bool do_parse = false;
 	bool do_codegen = false;
+	bool do_tacky = false;
 
 	static struct option long_options[] = {
 		{"lex",     no_argument,       0, 'l'},
 		{"parse",   no_argument,       0, 'p'},
 		{"codegen", no_argument,       0, 'c'},
-		{"output",  required_argument, 0, 'o'},
+		{"tacky",   no_argument,       0, 't'},
+		{"output",  optional_argument, 0, 'o'},
 		{"help",    no_argument,       0, 'h'},
 		{0, 0, 0, 0}
 	};
 
 	int opt;
-	while ((opt = getopt_long(argc, argv, "lpco:h", long_options, NULL)) != -1) {
+	while ((opt = getopt_long(argc, argv, "lpcto:h", long_options, NULL)) != -1) {
 		switch (opt) {
 			case 'l': do_lex = true; break;
 			case 'p': do_parse = true; break;
 			case 'c': do_codegen = true; break;
+			case 't': do_tacky = true; break;
 			case 'o': output_file = optarg; break;
 			case 'h': print_usage(argv[0]); return 0;
 			default: fprintf(stderr, "Try '%s --help' for more information.\n", argv[0]); return 1;
@@ -69,8 +73,8 @@ int main(int argc, char *argv[]) {
 
 	input_file = argv[optind];
 
-	if (!do_lex && !do_parse && !do_codegen) {
-		do_lex = do_parse = do_codegen = true;
+	if (!do_lex && !do_parse && !do_codegen && !do_tacky) {
+		do_lex = do_parse = do_codegen = do_tacky = true;
 	}
 
 	u8 backing_buffer[BACKING_BUFFER_LENGTH];
@@ -103,8 +107,8 @@ int main(int argc, char *argv[]) {
 	}
 
 	Parser *parser = Parser_init(&allocator, tokens);
-	ASTProgram *program_ast = Parser_parse(parser);
-	if (program_ast == NULL) {
+	ASTProgram *ast_program = Parser_parse(parser);
+	if (ast_program == NULL) {
 		fprintf(stderr, "Parsing failed\n");
 		ArenaAllocator_freeAll(&allocator);
 		return 1;
@@ -112,9 +116,24 @@ int main(int argc, char *argv[]) {
 
 	if (do_parse) {
 		printf("[PARSING ONLY]\n");
-		pretty_print_ast(program_ast);
+		dump_ast(ast_program);
 		printf("\n");
 	}
+
+	Tacky *tacky = Tacky_create(&allocator);
+	TackyProgram *tacky_program = emit_tacky(tacky, ast_program);
+	if (tacky_program == NULL) {
+		fprintf(stderr, "Failed converting to TACKY\n");
+		ArenaAllocator_freeAll(&allocator);
+		return 1;
+	}
+
+	if (do_tacky) {
+		printf("[TACKY DUMP]\n");
+		dump_tacky(tacky_program);
+		printf("\n");
+	}
+
 
 	FILE *out_file = fopen(output_file, "w");
 	if (out_file == NULL) {
