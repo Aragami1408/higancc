@@ -25,10 +25,10 @@ typedef struct {\
     ArenaAllocator *allocator;\
 } ArrayList_##Type;\
 ArrayList_##Type* ArrayList_##Type##_init(ArenaAllocator *a);\
-usize ArrayList_##Type##_size(ArrayList_##Type *arr);\
+usize ArrayList_##Type##_size(const ArrayList_##Type *arr);\
 usize ArrayList_##Type##_capacity(ArrayList_##Type *arr);\
 bool ArrayList_##Type##_isEmpty(ArrayList_##Type *arr);\
-Type ArrayList_##Type##_get(ArrayList_##Type *arr, usize index);\
+Type ArrayList_##Type##_get(const ArrayList_##Type *arr, usize index);\
 void ArrayList_##Type##_set(ArrayList_##Type *arr, usize index, Type elem);\
 void ArrayList_##Type##_add(ArrayList_##Type *arr, Type elem);\
 void ArrayList_##Type##_addAt(ArrayList_##Type *arr, usize index, Type elem);\
@@ -43,7 +43,7 @@ ArrayList_##Type* ArrayList_##Type##_init(ArenaAllocator *a) {\
     array_list->allocator = a;\
 	return array_list;\
 }\
-usize ArrayList_##Type##_size(ArrayList_##Type *arr) {\
+usize ArrayList_##Type##_size(const ArrayList_##Type *arr) {\
 	return arr->len;\
 }\
 usize ArrayList_##Type##_capacity(ArrayList_##Type *arr){\
@@ -52,7 +52,7 @@ usize ArrayList_##Type##_capacity(ArrayList_##Type *arr){\
 bool ArrayList_##Type##_isEmpty(ArrayList_##Type *arr) {\
 	return arr->len == 0;\
 }\
-Type ArrayList_##Type##_get(ArrayList_##Type *arr, usize index) {\
+Type ArrayList_##Type##_get(const ArrayList_##Type *arr, usize index) {\
 	return arr->data[index];\
 }\
 void ArrayList_##Type##_set(ArrayList_##Type *arr, usize index, Type elem) {\
