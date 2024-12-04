@@ -126,3 +126,12 @@ void dump_tacky(const TackyProgram *program) {
 	}
 	printf("}\n");
 }
+
+void dump_tokens(const ArrayList(Token) *tokens) {
+  for (usize i = 0; i < ArrayList_size(Token, tokens); i++) {
+    Token token = ArrayList_get(Token, tokens, i);
+    printf("%4d ", token.line);
+    printf("%s \"%.*s\"\n", token_type_strings[token.type], token.length, token.start);
+  }
+}
+

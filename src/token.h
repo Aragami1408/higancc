@@ -62,7 +62,5 @@ typedef struct {
   int line;
 } Token;
 
-void print_token(const Token *token);
-
 ARRAYLIST_PROTOTYPE(Token)
 #endif
