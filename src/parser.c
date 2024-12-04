@@ -66,14 +66,14 @@ static void consume(Parser *parser, TokenType type, const char *message) {
 // RECURSIVE DESCENT PARSING
 // -------------------------
 
-ASTProgram *parse_program(Parser *parser);
-ASTFunction *parse_function(Parser *parser);
-ASTStatement *parse_statement(Parser *parser);
-ASTExpression *parse_exp(Parser *parser);
-ASTOperator parse_unop(Parser *parser);
+// static ASTProgram *parse_program(Parser *parser);
+static ASTFunction *parse_function(Parser *parser);
+static ASTStatement *parse_statement(Parser *parser);
+static ASTExpression *parse_exp(Parser *parser);
+static ASTOperator parse_unop(Parser *parser);
 
 
-ASTFunction *parse_function(Parser *parser) {
+static ASTFunction *parse_function(Parser *parser) {
 
 	if (!(check(parser, TOKEN_KW_INT) || check(parser, TOKEN_KW_FLOAT))) {
 		error(parser, "Expect 'int' or 'float' before function name.");
@@ -103,7 +103,7 @@ ASTFunction *parse_function(Parser *parser) {
 	return function;
 }
 
-ASTStatement *parse_statement(Parser *parser) {
+static ASTStatement *parse_statement(Parser *parser) {
 	consume(parser, TOKEN_KW_RETURN, "Expect 'return' before expression.");
 
 	ASTExpression *return_expr = parse_exp(parser);
@@ -116,7 +116,7 @@ ASTStatement *parse_statement(Parser *parser) {
 	return statement;
 }
 
-ASTOperator parse_unop(Parser *parser) {
+static ASTOperator parse_unop(Parser *parser) {
 	if (check(parser, TOKEN_TILDE))
 		return AST_UNARY_COMPLEMENT;
 	else if (check(parser, TOKEN_MINUS))
@@ -125,7 +125,7 @@ ASTOperator parse_unop(Parser *parser) {
 		return -1;
 }
 
-ASTExpression *parse_exp(Parser *parser) {
+static ASTExpression *parse_exp(Parser *parser) {
 	ASTExpression *expr = (ASTExpression *)ArenaAllocator_alloc(parser->allocator, sizeof(ASTExpression));
 	if (check(parser, TOKEN_INT) || check(parser, TOKEN_FLOAT)) {
 		int value = atoi(substring(parser->allocator, peek(parser).start, 0, peek(parser).length)); 
