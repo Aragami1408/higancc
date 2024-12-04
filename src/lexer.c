@@ -184,23 +184,18 @@ static Token number(Lexer *lexer) {
 	return make_token(lexer, TOKEN_INT);
 }
 
-Lexer *Lexer_init(ArenaAllocator *a, const char *source) {
-	Lexer *lexer = (Lexer *)ArenaAllocator_alloc(a, sizeof(Lexer));
-	if (lexer == NULL) {
-		fprintf(stderr, "Failed to allocate lexer\n");
-		exit(1);
-	}
+Lexer Lexer_init(const char *source) {
+	Lexer lexer;
 
-	lexer->start = source;
-	lexer->current = source;
-	lexer->line = 1;
-	lexer->allocator = a;
+	lexer.start = source;
+	lexer.current = source;
+	lexer.line = 1;
 
 	return lexer;
 }
 
-ArrayList(Token) *Lexer_scanTokens(Lexer *lexer, usize *len) {
-	ArrayList(Token) *tokens = ArrayList_init(Token, lexer->allocator);
+ArrayList(Token) *Lexer_scanTokens(Lexer *lexer, ArenaAllocator *allocator) {
+	ArrayList(Token) *tokens = ArrayList_init(Token, allocator);
 
 	Token token;
 	do {
@@ -209,7 +204,6 @@ ArrayList(Token) *Lexer_scanTokens(Lexer *lexer, usize *len) {
 		//arrput(tokens, token);
 	} while (token.type != TOKEN_EOF);
 
-	*len = ArrayList_size(Token, tokens);
 
 	return tokens;
 }

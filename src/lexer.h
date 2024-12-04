@@ -9,11 +9,10 @@ typedef struct {
   const char *start;
   const char *current;
   int line;
-  ArenaAllocator *allocator; 
 } Lexer;
 
-Lexer *Lexer_init(ArenaAllocator *a, const char *source);
-ArrayList(Token) *Lexer_scanTokens(Lexer *lexer, usize *len);
+Lexer Lexer_init(const char *source);
+ArrayList(Token) *Lexer_scanTokens(Lexer *lexer, ArenaAllocator *allocator);
 Token Lexer_scanToken(Lexer *lexer);
 
 #endif
