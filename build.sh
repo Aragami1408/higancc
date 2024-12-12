@@ -19,7 +19,10 @@ RELEASE_EXE="higancc_release"
 
 # Function to compile source files
 compile() {
-  mkdir -p "$OBJ_DIR" "$BIN_DIR"
+  if [ ! -d "$OBJ_DIR" "$BIN_DIR" ]; then
+    mkdir -p "$OBJ_DIR" "$BIN_DIR"
+  fi
+
   local FLAGS=$1
 
     # Compile each source file into an object file
