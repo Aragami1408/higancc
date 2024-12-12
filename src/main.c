@@ -22,16 +22,6 @@ void print_usage(const char* program_name) {
 	printf("  -h, --help              Display this help message\n");
 }
 
-void print_tokens(ArrayList(Token) *tokens, usize len) {
-	for (usize i = 0; i < len; i++) {
-		Token token = ArrayList_get(Token, tokens, i);
-		print_token(&token);
-		if (token.type == TOKEN_ERROR || token.type == TOKEN_EOF) {
-			break;
-		}
-	}
-}
-
 int main(int argc, char *argv[]) {
 	char *input_file = NULL;
 
@@ -83,16 +73,20 @@ int main(int argc, char *argv[]) {
 
 	char *source = read_file(&allocator, input_file);  
 
-	Lexer *lexer = Lexer_init(&allocator, source);
-	usize token_list_size = 0;
-	ArrayList(Token) *tokens = Lexer_scanTokens(lexer, &token_list_size);
+    if (source != NULL) {
+        printf("[SOURCE CODE]\n");
+        printf("%s\n\n", source);
+    }
+
+	Lexer lexer = Lexer_init(source);
+	ArrayList(Token) *tokens = Lexer_scanTokens(&lexer, &allocator);
 	if (tokens == NULL) {
 		fprintf(stderr, "Lexical analysis failed\n");
 		ArenaAllocator_freeAll(&allocator);
 		return 1;
 	}
 
-	for (usize i = 0; i < token_list_size; i++) {
+	for (usize i = 0; i < ArrayList_size(Token, tokens); i++) {
 		Token token = ArrayList_get(Token, tokens, i);
 		if (token.type == TOKEN_ERROR) {
 			fprintf(stderr, "[LEXER ERROR - line %d] %.*s\n", token.line, token.length, token.start);
@@ -101,8 +95,8 @@ int main(int argc, char *argv[]) {
 	}
 
 	if (do_lex) {
-		printf("[LEX ONLY]\n");
-		print_tokens(tokens, token_list_size);
+		printf("[LEXER - TOKEN DUMP]\n");
+        dump_tokens(tokens);
 		printf("\n");
 	}
 
@@ -115,7 +109,7 @@ int main(int argc, char *argv[]) {
 	}
 
 	if (do_parse) {
-		printf("[PARSING ONLY]\n");
+		printf("[Parser - AST DUMP]\n");
 		dump_ast(ast_program);
 		printf("\n");
 	}
@@ -129,7 +123,7 @@ int main(int argc, char *argv[]) {
 	}
 
 	if (do_tacky) {
-		printf("[TACKY DUMP]\n");
+		printf("[IR - TACKY DUMP]\n");
 		dump_tacky(tacky_program);
 		printf("\n");
 	}
