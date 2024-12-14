@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <string.h>
-#include <getopt.h>
 
 #include "common.h"
+#include "argparse.h"
 #include "utils.h"
 #include "lexer.h"
 #include "parser.h"
@@ -11,16 +11,8 @@
 #include "dump.h"
 #include "tacky.h"
 
-void print_usage(const char* program_name) {
-	printf("Usage: %s [options] <input_file>\n", program_name);
-	printf("Options:\n");
-	printf("  -l, --lex               Perform lexical analysis and print tokens\n");
-	printf("  -p, --parse             Perform parsing and print AST\n");
-	printf("  -c, --codegen           Perform code generation and print assembly code\n");
-	printf("  -t, --tacky             Perform IR conversion and print TACKY code\n");
-	printf("  -o, --output <file>     Specify output file (default: a.out)\n");
-	printf("  -h, --help              Display this help message\n");
-}
+// TODO(higanbana): build yourself an arg parser
+#include <getopt.h>
 
 int main(int argc, char *argv[]) {
 	char *input_file = NULL;
@@ -71,7 +63,7 @@ int main(int argc, char *argv[]) {
 	ArenaAllocator allocator;
 	ArenaAllocator_init(&allocator, backing_buffer, BACKING_BUFFER_LENGTH);
 
-	char *source = read_file(&allocator, input_file);  
+	char *source = read_file(&allocator, input_file);
 
     if (source != NULL) {
         printf("[SOURCE CODE]\n");
@@ -100,8 +92,8 @@ int main(int argc, char *argv[]) {
 		printf("\n");
 	}
 
-	Parser *parser = Parser_init(&allocator, tokens);
-	ASTProgram *ast_program = Parser_parse(parser);
+	Parser parser = Parser_init(tokens);
+	ASTProgram *ast_program = Parser_parse(&parser, &allocator);
 	if (ast_program == NULL) {
 		fprintf(stderr, "Parsing failed\n");
 		ArenaAllocator_freeAll(&allocator);

@@ -11,10 +11,9 @@
 typedef struct {
   ArrayList(Token) *tokens;
   usize current;
-  ArenaAllocator *allocator;
 } Parser;
 
-Parser *Parser_init(ArenaAllocator *a, ArrayList(Token) *tokens);
-ASTProgram *Parser_parse(Parser *parser);
+Parser Parser_init(ArrayList(Token) *tokens);
+ASTProgram *Parser_parse(Parser *parser, ArenaAllocator *allocator);
 
 #endif
