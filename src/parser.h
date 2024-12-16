@@ -9,8 +9,8 @@
 
 
 typedef struct {
-  ArrayList(Token) *tokens;
-  usize current;
+	ArrayList(Token) *tokens;
+	usize current;
 } Parser;
 
 Parser Parser_init(ArrayList(Token) *tokens);

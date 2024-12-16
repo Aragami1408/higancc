@@ -6,9 +6,9 @@
 #include "memory.h"
 
 typedef struct {
-  const char *start;
-  const char *current;
-  int line;
+	const char *start;
+	const char *current;
+	int line;
 } Lexer;
 
 Lexer Lexer_init(const char *source);

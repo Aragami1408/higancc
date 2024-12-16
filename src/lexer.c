@@ -17,7 +17,7 @@ static Token make_token(const Lexer *lexer, TokenType type) {
 	token.type = type;
 	token.start = lexer->start;
 	token.length = (int)(lexer->current - lexer->start);
-	token.line = lexer->line; 
+	token.line = lexer->line;
 
 	return token;
 }
@@ -28,7 +28,7 @@ static Token error_token(const Lexer *lexer, const char *message) {
 	token.type = TOKEN_ERROR;
 	token.start = message;
 	token.length = (int)strlen(message);
-	token.line = lexer->line; 
+	token.line = lexer->line;
 
 	return token;
 }

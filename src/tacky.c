@@ -99,6 +99,7 @@ TackyProgram *emit_tacky(Tacky *tacky, const ASTProgram *program) {
 
 		TackyFunction tacky_function;
 		tacky_function.name = function.name;
+		// TODO(higanbana): Fix emit_instructions that each functions contain their respective instructions
 		tacky_function.body = emit_instructions(tacky, function.statements);
 		
 		ArrayList_add(TackyFunction, tacky_functions, tacky_function);

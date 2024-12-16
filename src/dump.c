@@ -36,7 +36,7 @@ static void print_ast_statement(const ASTStatement *stmt, usize depth) {
 	}
 
 	TAB;
-	printf("}\n");	
+	printf("}\n");
 }
 
 static void print_ast_function(const ASTFunction *func, usize depth) {
@@ -49,7 +49,7 @@ static void print_ast_function(const ASTFunction *func, usize depth) {
 	}
 
 	TAB;
-	printf("}\n");	
+	printf("}\n");
 }
 
 
@@ -88,7 +88,7 @@ static void print_tacky_instruction(const TackyInstruction *instruction, usize d
 			break;
 	}
 
-	printf(")\n");	
+	printf(")\n");
 }
 
 static void print_tacky_function(const TackyFunction *func, usize depth) {
@@ -101,7 +101,7 @@ static void print_tacky_function(const TackyFunction *func, usize depth) {
 	}
 
 	TAB;
-	printf("}\n");	
+	printf("}\n");
 }
 
 void dump_tacky_inst(const ArrayList(TackyInstruction) *instructions) {
@@ -133,7 +133,7 @@ void dump_ast(const struct ASTProgram *program) {
 		print_ast_function(&func, depth+1);
 	}
 
-	printf("}\n");	
+	printf("}\n");
 }
 
 void dump_tokens(const ArrayList(Token) *tokens) {
