@@ -23,10 +23,10 @@
 typedef struct ArenaAllocator ArenaAllocator;
 
 struct ArenaAllocator {
-  u8 *buf;
-  usize buf_len;
-  usize prev_offset;
-  usize curr_offset;
+	u8 *buf;
+	usize buf_len;
+	usize prev_offset;
+	usize curr_offset;
 };
 
 void ArenaAllocator_init(ArenaAllocator *a, void *backing_buffer, usize backing_buffer_length);

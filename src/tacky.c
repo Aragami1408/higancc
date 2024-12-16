@@ -87,7 +87,7 @@ TackyProgram *emit_tacky(Tacky *tacky, const ASTProgram *program) {
 		return NULL;
 	}
 
-	TackyProgram *tacky_program= (TackyProgram *)ArenaAllocator_alloc(tacky->allocator, sizeof(TackyProgram));
+	TackyProgram *tacky_program = (TackyProgram *)ArenaAllocator_alloc(tacky->allocator, sizeof(TackyProgram));
 	ArrayList(TackyFunction) *tacky_functions = ArrayList_init(TackyFunction, tacky->allocator);
 
 	for (usize i = 0; i < ArrayList_size(ASTFunction, program->functions); i++) {
@@ -104,5 +104,5 @@ TackyProgram *emit_tacky(Tacky *tacky, const ASTProgram *program) {
 		ArrayList_add(TackyFunction, tacky_functions, tacky_function);
 	}
 	tacky_program->functions = tacky_functions;
-	return tacky_program;	
+	return tacky_program;
 }

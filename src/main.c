@@ -14,6 +14,8 @@
 // TODO(higanbana): build yourself an arg parser
 #include <getopt.h>
 
+u8 backing_buffer[BACKING_BUFFER_LENGTH];
+
 int main(int argc, char *argv[]) {
 	char *input_file = NULL;
 
@@ -59,16 +61,16 @@ int main(int argc, char *argv[]) {
 		do_lex = do_parse = do_codegen = do_tacky = true;
 	}
 
-	u8 backing_buffer[BACKING_BUFFER_LENGTH];
+
 	ArenaAllocator allocator;
 	ArenaAllocator_init(&allocator, backing_buffer, BACKING_BUFFER_LENGTH);
 
 	char *source = read_file(&allocator, input_file);
 
-    if (source != NULL) {
-        printf("[SOURCE CODE]\n");
-        printf("%s\n\n", source);
-    }
+	if (source != NULL) {
+		printf("[SOURCE CODE]\n");
+		printf("%s\n\n", source);
+	}
 
 	Lexer lexer = Lexer_init(source);
 	ArrayList(Token) *tokens = Lexer_scanTokens(&lexer, &allocator);
@@ -88,7 +90,7 @@ int main(int argc, char *argv[]) {
 
 	if (do_lex) {
 		printf("[LEXER - TOKEN DUMP]\n");
-        dump_tokens(tokens);
+		dump_tokens(tokens);
 		printf("\n");
 	}
 
@@ -132,5 +134,5 @@ int main(int argc, char *argv[]) {
 	ArenaAllocator_freeAll(&allocator);
 	fclose(out_file);
 
-	return 0; 
+	return 0;
 }
