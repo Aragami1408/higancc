@@ -41,6 +41,8 @@ static TackyVal emit_expr(Tacky *tacky, const ASTExpression *expression) {
 			
 			return dst;
 		}
+		default:
+			return (TackyVal) {.type = TACKY_VAL_CONSTANT, .constant = -1};
 	}
 }
 

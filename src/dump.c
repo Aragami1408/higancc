@@ -7,10 +7,10 @@
 static void print_ast_expression(const ASTExpression *expr, usize depth) {
 	TAB;
 	switch (expr->type) {
-        case AST_EXPRESSION_CONSTANT:
+		case AST_EXPRESSION_CONSTANT:
 			printf("Constant(%d)\n", expr->constant);
 			break;
-        case AST_EXPRESSION_UNARY:
+		case AST_EXPRESSION_UNARY:
 			printf("Unary(");
 			switch (expr->unary.op) {
 				case AST_UNARY_COMPLEMENT:
@@ -21,19 +21,19 @@ static void print_ast_expression(const ASTExpression *expr, usize depth) {
 					break;
 			}
 			print_ast_expression(expr->unary.val, depth+1);
-        	break;
-    }
+			break;
+	}
 }
 
 static void print_ast_statement(const ASTStatement *stmt, usize depth) {
 	TAB;
 
 	switch (stmt->type) {
-        case AST_STATEMENT_RETURN:
+		case AST_STATEMENT_RETURN:
 			printf("Return {\n");
 			print_ast_expression(stmt->return_expr, depth+1);
-        break;
-    }
+			break;
+	}
 
 	TAB;
 	printf("}\n");	
@@ -80,11 +80,11 @@ static void print_tacky_instruction(const TackyInstruction *instruction, usize d
 	TAB;
 
 	switch (instruction->type) {
-        case TACKY_INSTRUCTION_RETURN:
+		case TACKY_INSTRUCTION_RETURN:
 			printf("Return(");
 			print_tacky_val(&instruction->return_val);
-        break;
-        case TACKY_INSTRUCTION_UNARY:
+			break;
+		case TACKY_INSTRUCTION_UNARY:
 			printf("Unary(");
 			switch (instruction->unary.op) {
 				case TACKY_OPERATOR_UNARY_COMPLEMENT:
@@ -97,8 +97,8 @@ static void print_tacky_instruction(const TackyInstruction *instruction, usize d
 			print_tacky_val(&instruction->unary.src);
 			printf(", ");
 			print_tacky_val(&instruction->unary.dst);
-        break;
-        }
+			break;
+	}
 
 	printf(")\n");	
 }
@@ -128,10 +128,10 @@ void dump_tacky(const TackyProgram *program) {
 }
 
 void dump_tokens(const ArrayList(Token) *tokens) {
-  for (usize i = 0; i < ArrayList_size(Token, tokens); i++) {
-    Token token = ArrayList_get(Token, tokens, i);
-    printf("%4d ", token.line);
-    printf("%s \"%.*s\"\n", token_type_strings[token.type], token.length, token.start);
-  }
+	for (usize i = 0; i < ArrayList_size(Token, tokens); i++) {
+		Token token = ArrayList_get(Token, tokens, i);
+		printf("%4d ", token.line);
+		printf("%s \"%.*s\"\n", token_type_strings[token.type], token.length, token.start);
+	}
 }
 
