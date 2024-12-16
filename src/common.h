@@ -5,7 +5,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#define BACKING_BUFFER_LENGTH 4096
+#define BACKING_BUFFER_LENGTH 8198
 
 typedef int8_t i8;
 typedef int16_t i16;

@@ -15,6 +15,7 @@
 #define ArrayList_set(Type, Array, Index, Elem) ArrayList_##Type##_set(Array, Index, Elem)
 #define ArrayList_add(Type, Array, Elem) ArrayList_##Type##_add(Array, Elem)
 #define ArrayList_addAt(Type, Array, Index, Elem) ArrayList_##Type##_addAt(Array, Index, Elem)
+#define ArrayList_copy(Type, Array) ArrayList_##Type##_copy(Array)
 #define ArrayList_remove(Type, Array, Index) ArrayList_##Type##_remove(Array, Index)
 
 #define ARRAYLIST_PROTOTYPE(Type) \
@@ -32,6 +33,7 @@ Type ArrayList_##Type##_get(const ArrayList_##Type *arr, usize index);\
 void ArrayList_##Type##_set(ArrayList_##Type *arr, usize index, Type elem);\
 void ArrayList_##Type##_add(ArrayList_##Type *arr, Type elem);\
 void ArrayList_##Type##_addAt(ArrayList_##Type *arr, usize index, Type elem);\
+ArrayList_##Type* ArrayList_##Type##_copy(const ArrayList_##Type *src);\
 Type ArrayList_##Type##_remove(ArrayList_##Type *arr, usize index);\
 
 #define ARRAYLIST_IMPL(Type) \
@@ -77,6 +79,18 @@ void ArrayList_##Type##_addAt(ArrayList_##Type *arr, usize index, Type elem) {\
 	memmove(arr->data + index + 1, arr->data + index, sizeof(Type) * (arr->len - index));\
 	arr->data[index] = elem;\
 	arr->len++;\
+}\
+ArrayList_##Type* ArrayList_##Type##_copy(const ArrayList_##Type *src) {\
+	if (src == NULL) return NULL;\
+	ArrayList_##Type *dest = ArrayList_##Type##_init(src->allocator);\
+	if (dest->capacity < src->capacity) {\
+		dest->data = (Type*)ArenaAllocator_resize(dest->allocator, dest->data, dest->capacity, src->capacity * sizeof(Type));\
+		dest->capacity = src->capacity;\
+	}\
+	for (usize i = 0; i < src->len; i++) {\
+		ArrayList_##Type##_add(dest, ArrayList_##Type##_get(src, i));\
+	}\
+	return dest;\
 }\
 Type ArrayList_##Type##_remove(ArrayList_##Type *arr, usize index) {\
 	if (index >= arr->len) return (Type){0};\
