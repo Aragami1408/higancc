@@ -9,6 +9,7 @@
 #include "tacky.h"
 #include "token.h"
 
+void dump_tacky_inst(const ArrayList(TackyInstruction) *instructions);
 void dump_tacky(const TackyProgram *program);
 void dump_ast(const ASTProgram *program);
 void dump_tokens(const ArrayList(Token) *tokens);

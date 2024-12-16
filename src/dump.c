@@ -52,18 +52,6 @@ static void print_ast_function(const ASTFunction *func, usize depth) {
 	printf("}\n");	
 }
 
-void dump_ast(const struct ASTProgram *program) {
-	usize depth = 0;
-
-	printf("Program {\n");
-
-	for (usize i = 0; i < program->functions->len; i++) {
-		ASTFunction func = ArrayList_get(ASTFunction, program->functions, i);
-		print_ast_function(&func, depth+1);
-	}
-
-	printf("}\n");	
-}
 
 static void print_tacky_val(const TackyVal *val) {
 	switch (val->type) {
@@ -116,6 +104,14 @@ static void print_tacky_function(const TackyFunction *func, usize depth) {
 	printf("}\n");	
 }
 
+void dump_tacky_inst(const ArrayList(TackyInstruction) *instructions) {
+	for (usize i = 0; i < instructions->len; i++) {
+		TackyInstruction inst = ArrayList_get(TackyInstruction, instructions, i);
+
+		print_tacky_instruction(&inst, 0);
+	}
+}
+
 void dump_tacky(const TackyProgram *program) {
 	usize depth = 0;
 
@@ -125,6 +121,19 @@ void dump_tacky(const TackyProgram *program) {
 		print_tacky_function(&func, depth+1);
 	}
 	printf("}\n");
+}
+
+void dump_ast(const struct ASTProgram *program) {
+	usize depth = 0;
+
+	printf("Program {\n");
+
+	for (usize i = 0; i < program->functions->len; i++) {
+		ASTFunction func = ArrayList_get(ASTFunction, program->functions, i);
+		print_ast_function(&func, depth+1);
+	}
+
+	printf("}\n");	
 }
 
 void dump_tokens(const ArrayList(Token) *tokens) {
