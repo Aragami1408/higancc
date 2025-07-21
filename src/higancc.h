@@ -25,7 +25,10 @@ struct Token {
 
 Token *token;
 
+char *user_input;
+
 void error(char *fmt, ...);
+void error_at(char *loc, char *fmt, ...);
 
 bool consume(char op);
 void expect(char op);
