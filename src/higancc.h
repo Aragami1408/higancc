@@ -23,9 +23,9 @@ struct Token {
 	char *str;
 };
 
-Token *token;
+extern Token *token;
 
-char *user_input;
+extern char *user_input;
 
 void error(char *fmt, ...);
 void error_at(char *loc, char *fmt, ...);
@@ -36,5 +36,20 @@ int expect_number();
 bool at_eof();
 Token *new_token(TokenKind kind, Token *cur, char *str);
 Token *tokenize(char *p);
+
+typedef enum {
+	ND_ADD,
+	ND_SUB,
+	ND_MUL,
+	ND_DIV,
+	ND_NUM
+} NodeKind;
+
+typedef struct Node Node;
+
+struct Node {
+	NodeKind kind;
+
+};
 
 #endif
