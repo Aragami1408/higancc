@@ -32,8 +32,8 @@ void error_at(char *loc, char *fmt, ...);
 
 bool consume(char op);
 void expect(char op);
-int expect_number();
-bool at_eof();
+int expect_number(void);
+bool at_eof(void);
 Token *new_token(TokenKind kind, Token *cur, char *str);
 Token *tokenize(char *p);
 
@@ -49,7 +49,15 @@ typedef struct Node Node;
 
 struct Node {
 	NodeKind kind;
-
+	Node *lhs;
+	Node *rhs;
+	int val; // set if kind = ND_NUM
 };
+
+Node *expr(void);
+
+
+void gen(Node *node);
+
 
 #endif
