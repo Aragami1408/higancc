@@ -26,6 +26,8 @@ int main(int argc, char** argv) {
 	printf(".globl main\n");
 	printf("main:\n");
 
+	// Prologue
+	// Allocate space for 26 variables (from 'a' to 'z')
 	printf("    push rbp\n");
 	printf("    mov rbp, rsp\n");
 	printf("    sub rsp, 208\n");
@@ -33,9 +35,13 @@ int main(int argc, char** argv) {
 	for (int i = 0; code[i]; i++) {
 		gen(code[i]);
 
+		// Since there should be one value remaining on the stack as the result of evaluating the expression
+		// Pop it to prevent to stack from overflowing
 		printf("    pop rax\n");
 	}
 
+	// Epilogue
+	// The result of the last expression remains in RAX, so that becomes the return value
 	printf("    mov rsp, rbp\n");
 	printf("    pop rbp\n");
 	printf("    ret\n");

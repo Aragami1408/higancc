@@ -44,18 +44,13 @@ Token *tokenize(char *p);
 
 // parser.c
 typedef enum {
-	ND_ADD,
-	ND_SUB,
-	ND_MUL,
-	ND_DIV,
-	ND_EQ,
-	ND_NEQ,
-	ND_LT,
-	ND_GT,
-	ND_LE,
-	ND_GE,
+	ND_ADD, ND_SUB, ND_MUL, ND_DIV,
+
+	ND_EQ, ND_NEQ, ND_LT, ND_GT, ND_LE, ND_GE,
+
 	ND_ASSIGN,
-	ND_LVAR,
+	ND_LVAR, // Local variable
+
 	ND_NUM
 } NodeKind;
 
