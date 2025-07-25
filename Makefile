@@ -1,5 +1,6 @@
 CC=gcc
 CFLAGS=-std=c11 -g -fno-common -Wall -Wno-switch
+LDFLAGS=-lm
 
 SRCS=$(wildcard src/*.c)
 OBJS=$(SRCS:.c=.o)
